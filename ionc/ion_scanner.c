@@ -1196,6 +1196,7 @@ iERR _ion_scanner_skip_unknown_lob(ION_SCANNER *scanner)
             break;
         case '\"':
             IONCHECK(_ion_scanner_skip_plain_clob(scanner));
+            SUCCEED();
             break;
         case '}':
             IONCHECK(_ion_scanner_read_char(scanner, &c));
