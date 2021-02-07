@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 // helper functions in IonHelper.c
-ION_API_EXPORT BOOL     ion_helper_is_ion_version_marker(BYTE *buffer, SIZE len);
+ION_API_EXPORT BOOL     ion_helper_is_ion_version_marker(BYTE *buffer, ION_SIZE len);
 ION_API_EXPORT int      ion_helper_get_tid_from_ion_type(ION_TYPE t);
 ION_API_EXPORT ION_TYPE ion_helper_get_iontype_from_tid(int tid);
 
@@ -60,11 +60,11 @@ ION_API_EXPORT const char *ion_error_to_str(iERR err);
 
 // utility for portable integer to string, constrained to base-10
 // NB dest must be large enough (MAX_INT32_LENGTH)
-char *_ion_itoa_10(int32_t val, char *dst, SIZE len);
-char *_ion_i64toa_10(int64_t val, char *dst, SIZE len);
+char *_ion_itoa_10(int32_t val, char *dst, ION_SIZE len);
+char *_ion_i64toa_10(int64_t val, char *dst, ION_SIZE len);
 
 // utility for portable strnlen
-ION_API_EXPORT SIZE _ion_strnlen(const char *str, const SIZE maxlen);
+ION_API_EXPORT ION_SIZE _ion_strnlen(const char *str, const ION_SIZE maxlen);
 
 /** Get the absolute value of the given integer.
  *

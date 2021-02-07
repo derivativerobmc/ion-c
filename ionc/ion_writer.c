@@ -69,7 +69,7 @@ iERR ion_writer_options_add_shared_imports(ION_WRITER_OPTIONS *options, ION_COLL
     iRETURN;
 }
 
-iERR ion_writer_options_add_shared_imports_symbol_tables(ION_WRITER_OPTIONS *options, ION_SYMBOL_TABLE **imports, SIZE imports_count)
+iERR ion_writer_options_add_shared_imports_symbol_tables(ION_WRITER_OPTIONS *options, ION_SYMBOL_TABLE **imports, ION_SIZE imports_count)
 {
     iENTER;
     ION_SYMBOL_TABLE_IMPORT *import;
@@ -109,7 +109,7 @@ iERR ion_writer_options_close_shared_imports(ION_WRITER_OPTIONS *options)
 iERR ion_writer_open_buffer(
          hWRITER *p_hwriter
         ,BYTE *buffer
-        ,SIZE buf_length
+        ,ION_SIZE buf_length
         ,ION_WRITER_OPTIONS *p_options // NULL == all defaults
 ) {
     iENTER;
@@ -128,7 +128,7 @@ iERR ion_writer_open_buffer(
 iERR _ion_writer_open_buffer_helper(
          ION_WRITER **p_pwriter
         ,BYTE *buffer
-        ,SIZE buf_length
+        ,ION_SIZE buf_length
         ,ION_WRITER_OPTIONS *p_options // NULL == all defaults
 )
 {
@@ -350,7 +350,7 @@ void _ion_writer_initialize_option_defaults(ION_WRITER_OPTIONS *p_options)
 }
 
 
-iERR ion_writer_get_depth(hWRITER hwriter, SIZE *p_depth)
+iERR ion_writer_get_depth(hWRITER hwriter, ION_SIZE *p_depth)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -364,7 +364,7 @@ iERR ion_writer_get_depth(hWRITER hwriter, SIZE *p_depth)
     iRETURN;
 }
 
-iERR _ion_writer_get_depth_helper(ION_WRITER *pwriter, SIZE *p_depth)
+iERR _ion_writer_get_depth_helper(ION_WRITER *pwriter, ION_SIZE *p_depth)
 {
     iENTER;
 
@@ -377,7 +377,7 @@ iERR _ion_writer_get_depth_helper(ION_WRITER *pwriter, SIZE *p_depth)
     iRETURN;
 }
 
-iERR ion_writer_set_temp_size(hWRITER hwriter, SIZE size_of_temp_space)
+iERR ion_writer_set_temp_size(hWRITER hwriter, ION_SIZE size_of_temp_space)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -390,7 +390,7 @@ iERR ion_writer_set_temp_size(hWRITER hwriter, SIZE size_of_temp_space)
     iRETURN;
 }
 
-iERR _ion_writer_set_temp_size_helper(ION_WRITER *pwriter, SIZE size_of_temp_space)
+iERR _ion_writer_set_temp_size_helper(ION_WRITER *pwriter, ION_SIZE size_of_temp_space)
 {
     iENTER;
 
@@ -407,7 +407,7 @@ iERR _ion_writer_set_temp_size_helper(ION_WRITER *pwriter, SIZE size_of_temp_spa
     iRETURN;
 }
 
-iERR ion_writer_set_max_annotation_count(hWRITER hwriter, SIZE annotation_limit)
+iERR ion_writer_set_max_annotation_count(hWRITER hwriter, ION_SIZE annotation_limit)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -424,7 +424,7 @@ iERR ion_writer_set_max_annotation_count(hWRITER hwriter, SIZE annotation_limit)
     iRETURN;
 }
 
-iERR _ion_writer_set_max_annotation_count_helper(ION_WRITER *pwriter, SIZE annotation_limit)
+iERR _ion_writer_set_max_annotation_count_helper(ION_WRITER *pwriter, ION_SIZE annotation_limit)
 {
     iENTER;
     void *ptemp = NULL;
@@ -841,7 +841,7 @@ iERR _ion_writer_change_symtab_intercept_state(ION_WRITER *pwriter, ION_STRING *
     iRETURN;
 }
 
-iERR _ion_writer_change_symtab_intercept_state_sid(ION_WRITER *pwriter, SID field_sid)
+iERR _ion_writer_change_symtab_intercept_state_sid(ION_WRITER *pwriter, ION_SID field_sid)
 {
     iENTER;
     ION_SYMBOL_TABLE *system;
@@ -925,7 +925,7 @@ iERR _ion_writer_write_field_name_helper(ION_WRITER *pwriter, ION_STRING *name)
     iRETURN;
 }
 
-iERR _ion_writer_write_field_sid_helper(ION_WRITER *pwriter, SID sid)
+iERR _ion_writer_write_field_sid_helper(ION_WRITER *pwriter, ION_SID sid)
 {
     iENTER;
 
@@ -942,12 +942,12 @@ iERR _ion_writer_write_field_sid_helper(ION_WRITER *pwriter, SID sid)
 }
 
 iERR _ion_writer_get_local_symbol_id_from_import_location(ION_WRITER *pwriter,
-                                                          ION_SYMBOL_IMPORT_LOCATION *import_location, SID *p_sid)
+                                                          ION_SYMBOL_IMPORT_LOCATION *import_location, ION_SID *p_sid)
 {
     iENTER;
     ION_SYMBOL_TABLE_IMPORT     *import;
     ION_COLLECTION_CURSOR       import_cursor;
-    SID local_offset, sid = UNKNOWN_SID;
+    ION_SID local_offset, sid = UNKNOWN_SID;
     ION_SYMBOL_TABLE *system;
 
     ASSERT(import_location && !ION_STRING_IS_NULL(&import_location->name) && import_location->location > 0);
@@ -1035,7 +1035,7 @@ iERR _ion_writer_write_field_name_symbol_helper(ION_WRITER *pwriter, ION_SYMBOL 
 
     ASSERT(pwriter);
     ASSERT(field_name);
-    SID sid;
+    ION_SID sid;
     ION_STRING *text;
 
     if (!ION_STRING_IS_NULL(&field_name->value)) {
@@ -1067,7 +1067,7 @@ iERR ion_writer_add_annotation(hWRITER hwriter, iSTRING annotation)
 {
     iENTER;
     ION_WRITER *pwriter;
-    SIZE annotation_prev;
+    ION_SIZE annotation_prev;
 
     if (!hwriter) FAILWITH(IERR_BAD_HANDLE);
     pwriter = HANDLE_TO_PTR(hwriter, ION_WRITER);
@@ -1102,7 +1102,7 @@ iERR _ion_writer_add_annotation_helper(ION_WRITER *pwriter, ION_STRING *annotati
     ASSERT(annotation_symbol);
 
     IONCHECK(ion_strdup(pwriter->_temp_entity_pool, &annotation_symbol->value, annotation));
-    annotation_symbol->sid = UNKNOWN_SID; // The text is known; the SID is irrelevant.
+    annotation_symbol->sid = UNKNOWN_SID; // The text is known; the ION_SID is irrelevant.
     annotation_symbol->add_count = 0;
 
     pwriter->annotation_curr++;
@@ -1110,7 +1110,7 @@ iERR _ion_writer_add_annotation_helper(ION_WRITER *pwriter, ION_STRING *annotati
     iRETURN;
 }
 
-iERR _ion_writer_add_annotation_sid_helper(ION_WRITER *pwriter, SID sid)
+iERR _ion_writer_add_annotation_sid_helper(ION_WRITER *pwriter, ION_SID sid)
 {
     iENTER;
     ION_SYMBOL *annotation_symbol;
@@ -1127,7 +1127,7 @@ iERR _ion_writer_add_annotation_sid_helper(ION_WRITER *pwriter, SID sid)
     annotation_symbol = &pwriter->annotations[pwriter->annotation_curr];
     ASSERT(annotation_symbol);
 
-    // This SID will be resolved during write.
+    // This ION_SID will be resolved during write.
     ION_STRING_INIT(&annotation_symbol->value);
     annotation_symbol->sid = sid;
     annotation_symbol->add_count = 0;
@@ -1141,7 +1141,7 @@ iERR ion_writer_add_annotation_symbol(hWRITER hwriter, ION_SYMBOL *annotation)
 {
     iENTER;
     ION_WRITER *pwriter;
-    SIZE annotation_prev;
+    ION_SIZE annotation_prev;
 
     if (!hwriter) FAILWITH(IERR_BAD_HANDLE);
     pwriter = HANDLE_TO_PTR(hwriter, ION_WRITER);
@@ -1159,7 +1159,7 @@ iERR _ion_writer_add_annotation_symbol_helper(ION_WRITER *pwriter, ION_SYMBOL *a
 {
     iENTER;
     ION_STRING *text;
-    SID sid;
+    ION_SID sid;
 
     if (!ION_STRING_IS_NULL(&annotation->value)) {
         IONCHECK(_ion_writer_add_annotation_helper(pwriter, &annotation->value));
@@ -1193,7 +1193,7 @@ iERR ion_writer_write_annotations(hWRITER hwriter, iSTRING p_annotations, int32_
     int32_t ii;
     ION_STRING *pstr;
     ION_WRITER *pwriter;
-    SIZE annotation_prev;
+    ION_SIZE annotation_prev;
 
     if (!hwriter) FAILWITH(IERR_BAD_HANDLE);
     pwriter = HANDLE_TO_PTR(hwriter, ION_WRITER);
@@ -1240,11 +1240,11 @@ iERR _ion_writer_write_annotations_helper(ION_WRITER *pwriter, ION_STRING *p_ann
     iRETURN;
 }
 
-iERR ion_writer_write_annotation_symbols(hWRITER hwriter, ION_SYMBOL *annotations, SIZE count)
+iERR ion_writer_write_annotation_symbols(hWRITER hwriter, ION_SYMBOL *annotations, ION_SIZE count)
 {
     iENTER;
     ION_WRITER *pwriter;
-    SIZE annotation_prev;
+    ION_SIZE annotation_prev;
 
     if (!hwriter) FAILWITH(IERR_BAD_HANDLE);
     pwriter = HANDLE_TO_PTR(hwriter, ION_WRITER);
@@ -1267,7 +1267,7 @@ iERR ion_writer_write_annotation_symbols(hWRITER hwriter, ION_SYMBOL *annotation
     iRETURN;
 }
 
-iERR _ion_writer_write_annotation_symbols_helper(ION_WRITER *pwriter, ION_SYMBOL *annotations, SIZE count)
+iERR _ion_writer_write_annotation_symbols_helper(ION_WRITER *pwriter, ION_SYMBOL *annotations, ION_SIZE count)
 {
     iENTER;
     int32_t ii;
@@ -1403,7 +1403,7 @@ iERR _ion_writer_intercept_max_sid_or_version(ION_WRITER *pwriter, int64_t value
 
     switch (pwriter->_current_symtab_intercept_state) {
         case iWSIS_IMPORT_MAX_ID:
-            import->descriptor.max_id = (SID)value;
+            import->descriptor.max_id = (ION_SID)value;
             ION_WRITER_SI_COMPLETE_IMPORT_MAX_ID(pwriter);
             break;
         case iWSIS_IMPORT_VERSION:
@@ -1700,7 +1700,7 @@ iERR _ion_writer_write_timestamp_helper(ION_WRITER *pwriter, ION_TIMESTAMP *valu
     iRETURN;
 }
 
-iERR _ion_writer_validate_symbol_id(ION_WRITER *pwriter, SID sid)
+iERR _ion_writer_validate_symbol_id(ION_WRITER *pwriter, ION_SID sid)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1722,7 +1722,7 @@ iERR _ion_writer_intercept_imports_symbol(ION_WRITER *pwriter, ION_STRING *value
     iRETURN;
 }
 
-iERR _ion_writer_intercept_imports_symbol_sid(ION_WRITER *pwriter, SID value)
+iERR _ion_writer_intercept_imports_symbol_sid(ION_WRITER *pwriter, ION_SID value)
 {
     iENTER;
     if (value == ION_SYS_SID_SYMBOL_TABLE) {
@@ -1751,7 +1751,7 @@ iERR _ion_writer_intercept_imports_ion_symbol(ION_WRITER *pwriter, ION_SYMBOL *v
     iRETURN;
 }
 
-iERR _ion_writer_write_symbol_id_helper(ION_WRITER *pwriter, SID value)
+iERR _ion_writer_write_symbol_id_helper(ION_WRITER *pwriter, ION_SID value)
 {
     iENTER;
 
@@ -1828,13 +1828,13 @@ iERR _ion_writer_write_ion_symbol_helper(ION_WRITER *pwriter, ION_SYMBOL *symbol
 {
     iENTER;
     ION_STRING *text;
-    SID sid;
+    ION_SID sid;
 
     ASSERT(pwriter);
     ASSERT(symbol);
 
     if (!ION_STRING_IS_NULL(&symbol->value)) {
-        // This symbol's text is known. Its previous SID and import location are irrelevant.
+        // This symbol's text is known. Its previous ION_SID and import location are irrelevant.
         IONCHECK(_ion_writer_write_symbol_helper(pwriter, &symbol->value));
     }
     else if (!ION_SYMBOL_IMPORT_LOCATION_IS_NULL(symbol)) {
@@ -1931,7 +1931,7 @@ iERR _ion_writer_write_string_helper(ION_WRITER *pwriter, ION_STRING *pstr)
     iRETURN;
 }
 
-iERR ion_writer_write_clob(hWRITER hwriter, BYTE *p_buf, SIZE length)
+iERR ion_writer_write_clob(hWRITER hwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -1948,7 +1948,7 @@ iERR ion_writer_write_clob(hWRITER hwriter, BYTE *p_buf, SIZE length)
     iRETURN;
 }
 
-iERR _ion_writer_write_clob_helper(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_write_clob_helper(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
 
@@ -1970,7 +1970,7 @@ iERR _ion_writer_write_clob_helper(ION_WRITER *pwriter, BYTE *p_buf, SIZE length
     iRETURN;
 }
 
-iERR ion_writer_write_blob(hWRITER hwriter, BYTE *p_buf, SIZE length)
+iERR ion_writer_write_blob(hWRITER hwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -1987,7 +1987,7 @@ iERR ion_writer_write_blob(hWRITER hwriter, BYTE *p_buf, SIZE length)
     iRETURN;
 }
 
-iERR _ion_writer_write_blob_helper(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_write_blob_helper(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     
@@ -2046,7 +2046,7 @@ iERR _ion_writer_start_lob_helper(ION_WRITER *pwriter, ION_TYPE lob_type)
     iRETURN;
 }
 
-iERR ion_writer_append_lob(hWRITER hwriter, BYTE *p_buf, SIZE length)
+iERR ion_writer_append_lob(hWRITER hwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -2063,7 +2063,7 @@ iERR ion_writer_append_lob(hWRITER hwriter, BYTE *p_buf, SIZE length)
     iRETURN;
 }
 
-iERR _ion_writer_append_lob_helper(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_append_lob_helper(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
 
@@ -2123,7 +2123,7 @@ iERR _ion_writer_finish_lob_helper(ION_WRITER *pwriter)
 iERR _ion_writer_transition_to_symtab_intercept_state(ION_WRITER *pwriter, ION_TYPE container_type)
 {
     iENTER;
-    SID annotation_sid;
+    ION_SID annotation_sid;
     ION_SYMBOL_TABLE_IMPORT *new_import;
 
     switch (ION_TYPE_INT(container_type)) {
@@ -2607,7 +2607,7 @@ iERR _ion_writer_write_all_values_helper(ION_WRITER *pwriter, ION_READER *preade
     iRETURN;
 }
 
-iERR ion_writer_flush(hWRITER hwriter, SIZE *p_bytes_flushed)
+iERR ion_writer_flush(hWRITER hwriter, ION_SIZE *p_bytes_flushed)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -2620,7 +2620,7 @@ iERR ion_writer_flush(hWRITER hwriter, SIZE *p_bytes_flushed)
     iRETURN;
 }
 
-iERR ion_writer_finish(hWRITER hwriter, SIZE *p_bytes_flushed)
+iERR ion_writer_finish(hWRITER hwriter, ION_SIZE *p_bytes_flushed)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -2648,7 +2648,7 @@ iERR ion_writer_finish(hWRITER hwriter, SIZE *p_bytes_flushed)
     iRETURN;
 }
 
-iERR _ion_writer_flush_helper(ION_WRITER *pwriter, SIZE *p_bytes_flushed)
+iERR _ion_writer_flush_helper(ION_WRITER *pwriter, ION_SIZE *p_bytes_flushed)
 {
     iENTER;
     int64_t start, finish;
@@ -2690,7 +2690,7 @@ iERR _ion_writer_flush_helper(ION_WRITER *pwriter, SIZE *p_bytes_flushed)
     }
 
     IONCHECK(ion_stream_flush(pwriter->output));
-    if (p_bytes_flushed) *p_bytes_flushed = (SIZE)(finish - start);    // TODO - this needs 64bit care
+    if (p_bytes_flushed) *p_bytes_flushed = (ION_SIZE)(finish - start);    // TODO - this needs 64bit care
 
     iRETURN;
 }
@@ -2779,10 +2779,10 @@ iERR _ion_writer_free_local_symbol_table( ION_WRITER *pwriter )
     iRETURN;
 }
 
-iERR _ion_writer_make_symbol_helper(ION_WRITER *pwriter, ION_STRING *pstr, SID *p_sid)
+iERR _ion_writer_make_symbol_helper(ION_WRITER *pwriter, ION_STRING *pstr, ION_SID *p_sid)
 {
     iENTER;
-    SID               sid = UNKNOWN_SID;
+    ION_SID               sid = UNKNOWN_SID;
     ION_SYMBOL_TABLE *psymtab;
 
     ASSERT(pwriter);
@@ -2884,7 +2884,7 @@ iERR _ion_writer_get_field_name_as_string_helper(ION_WRITER *pwriter, ION_STRING
     iRETURN;
 }
 
-iERR ion_writer_get_field_name_as_sid(hWRITER hwriter, SID *p_sid)
+iERR ion_writer_get_field_name_as_sid(hWRITER hwriter, ION_SID *p_sid)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -2898,7 +2898,7 @@ iERR ion_writer_get_field_name_as_sid(hWRITER hwriter, SID *p_sid)
     iRETURN;
 }
 
-iERR _ion_writer_get_field_name_as_sid_helper(ION_WRITER *pwriter, SID *p_sid)
+iERR _ion_writer_get_field_name_as_sid_helper(ION_WRITER *pwriter, ION_SID *p_sid)
 {
     iENTER;
 
@@ -3013,7 +3013,7 @@ iERR _ion_writer_get_annotation_as_string_helper(ION_WRITER *pwriter, int32_t id
     iRETURN;
 }
 
-iERR ion_writer_get_annotation_as_sid(hWRITER hwriter, int32_t idx, SID *p_sid)
+iERR ion_writer_get_annotation_as_sid(hWRITER hwriter, int32_t idx, ION_SID *p_sid)
 {
     iENTER;
     ION_WRITER *pwriter;
@@ -3027,7 +3027,7 @@ iERR ion_writer_get_annotation_as_sid(hWRITER hwriter, int32_t idx, SID *p_sid)
     iRETURN;
 }
 
-iERR _ion_writer_get_annotation_as_sid_helper(ION_WRITER *pwriter, int32_t idx, SID *p_sid)
+iERR _ion_writer_get_annotation_as_sid_helper(ION_WRITER *pwriter, int32_t idx, ION_SID *p_sid)
 {
     iENTER;
 
@@ -3055,7 +3055,7 @@ iERR _ion_writer_get_annotation_as_sid_helper(ION_WRITER *pwriter, int32_t idx, 
 
 // these are helper routines for the temp buffer the writers may need to use
 
-iERR ion_temp_buffer_init(hOWNER owner, ION_TEMP_BUFFER *temp_buffer, SIZE size_of_temp_space)
+iERR ion_temp_buffer_init(hOWNER owner, ION_TEMP_BUFFER *temp_buffer, ION_SIZE size_of_temp_space)
 {
     iENTER;
     BYTE *buf;
@@ -3073,7 +3073,7 @@ iERR ion_temp_buffer_init(hOWNER owner, ION_TEMP_BUFFER *temp_buffer, SIZE size_
     iRETURN;
 }
 
-iERR ion_temp_buffer_alloc(ION_TEMP_BUFFER *temp_buffer, SIZE needed, void **p_ptr)
+iERR ion_temp_buffer_alloc(ION_TEMP_BUFFER *temp_buffer, ION_SIZE needed, void **p_ptr)
 {
     iENTER;
     BYTE *buf;
@@ -3089,7 +3089,7 @@ iERR ion_temp_buffer_alloc(ION_TEMP_BUFFER *temp_buffer, SIZE needed, void **p_p
     iRETURN;
 }
 
-iERR ion_temp_buffer_make_utf8_string(ION_TEMP_BUFFER *temp_buffer, char *cstr, SIZE length, void **p_ptr, SIZE *p_utf8_length)
+iERR ion_temp_buffer_make_utf8_string(ION_TEMP_BUFFER *temp_buffer, char *cstr, ION_SIZE length, void **p_ptr, ION_SIZE *p_utf8_length)
 {
     iENTER;
     BYTE *buf;

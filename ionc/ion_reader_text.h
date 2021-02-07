@@ -279,7 +279,7 @@ extern "C" {
 
 // reader level functions
 iERR _ion_reader_text_open                      (ION_READER *preader);
-iERR _ion_reader_text_open_alloc_buffered_string(ION_READER *preader, SIZE len, ION_STRING *p_string, BYTE **p_buf, SIZE *p_buf_len);
+iERR _ion_reader_text_open_alloc_buffered_string(ION_READER *preader, ION_SIZE len, ION_STRING *p_string, BYTE **p_buf, ION_SIZE *p_buf_len);
 iERR _ion_reader_text_reset                     (ION_READER *preader, ION_TYPE parent_tid, POSITION local_end);
 iERR _ion_reader_text_reset_value               (ION_READER *preader);
 
@@ -295,7 +295,7 @@ iERR _ion_reader_text_step_out                  (ION_READER *preader);
 
 // various forms of "getters" to get information about the readers
 // current state, in particular the metadata about the current value
-iERR _ion_reader_text_get_depth                 (ION_READER *preader, SIZE *p_depth);
+iERR _ion_reader_text_get_depth                 (ION_READER *preader, ION_SIZE *p_depth);
 iERR _ion_reader_text_get_type                  (ION_READER *preader, ION_TYPE *p_value_type);
 iERR _ion_reader_text_is_null                   (ION_READER *preader, BOOL *p_is_null);
 iERR _ion_reader_text_has_any_annotations       (ION_READER *preader, BOOL *p_has_annotations);
@@ -306,11 +306,11 @@ iERR _ion_reader_text_get_an_annotation_symbol  (ION_READER *preader, int32_t id
 iERR _ion_reader_text_get_field_name            (ION_READER *preader, ION_STRING **p_pstr);
 iERR _ion_reader_text_get_field_name_symbol     (ION_READER *preader, ION_SYMBOL **p_psymbol);
 iERR _ion_reader_text_get_symbol_table          (ION_READER *preader, ION_SYMBOL_TABLE **p_return);
-iERR _ion_reader_text_get_field_sid             (ION_READER *preader, SID *p_sid);
-iERR _ion_reader_text_get_annotations           (ION_READER *preader, ION_STRING *p_strs, SIZE max_count, SIZE *p_count);
-iERR _ion_reader_text_get_annotation_symbols    (ION_READER *preader, ION_SYMBOL *p_symbols, SIZE max_count, SIZE *p_count);
+iERR _ion_reader_text_get_field_sid             (ION_READER *preader, ION_SID *p_sid);
+iERR _ion_reader_text_get_annotations           (ION_READER *preader, ION_STRING *p_strs, ION_SIZE max_count, ION_SIZE *p_count);
+iERR _ion_reader_text_get_annotation_symbols    (ION_READER *preader, ION_SYMBOL *p_symbols, ION_SIZE max_count, ION_SIZE *p_count);
 iERR _ion_reader_text_get_value_offset          (ION_READER *preader, POSITION *p_offset);
-iERR _ion_reader_text_get_value_length          (ION_READER *preader, SIZE *p_length);
+iERR _ion_reader_text_get_value_length          (ION_READER *preader, ION_SIZE *p_length);
 
 // value getting functions
 iERR _ion_reader_text_read_null                 (ION_READER *preader, ION_TYPE *p_value);
@@ -327,15 +327,15 @@ iERR _ion_reader_text_read_symbol               (ION_READER *preader, ION_SYMBOL
 
 // get string functions, these work over value of type string or type symbol
 // get length FORCES the value to read into the value_image buffer (which may not be desirable)
-iERR _ion_reader_text_get_string_length         (ION_READER *preader, SIZE *p_length);
+iERR _ion_reader_text_get_string_length         (ION_READER *preader, ION_SIZE *p_length);
 iERR _ion_reader_text_read_string               (ION_READER *preader, ION_STRING *p_user_str);
 iERR _ion_reader_text_load_string_in_value_buffer(ION_READER *preader);
-iERR _ion_reader_text_read_string_bytes         (ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) ;
+iERR _ion_reader_text_read_string_bytes         (ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) ;
 
 // get lob value functions, these work over value of type clob or type blob
 // get lob size FORCES the value to read into the value_image buffer (which may not be desirable)
-iERR _ion_reader_text_get_lob_size              (ION_READER *preader, SIZE *p_length);
-iERR _ion_reader_text_read_lob_bytes            (ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) ;
+iERR _ion_reader_text_get_lob_size              (ION_READER *preader, ION_SIZE *p_length);
+iERR _ion_reader_text_read_lob_bytes            (ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) ;
 
 #ifdef __cplusplus
 }

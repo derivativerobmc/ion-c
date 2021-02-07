@@ -416,7 +416,7 @@ iERR _ion_binary_read_decimal_helper(ION_STREAM *pstream, int32_t len, int32_t e
                                      decQuad *p_quad, decNumber **p_num) {
     iENTER;
     ION_INT mantissa;
-    SIZE decimal_digits;
+    ION_SIZE decimal_digits;
     uint32_t saved_status;
 
     ASSERT(p_quad);
@@ -561,7 +561,7 @@ iERR _ion_binary_write_decimal_zero( ION_STREAM *pstream, decQuad *value)
     iRETURN;
 }
 
-iERR ion_binary_write_int32_with_field_sid( ION_STREAM *pstream, SID sid, int32_t value )
+iERR ion_binary_write_int32_with_field_sid( ION_STREAM *pstream, ION_SID sid, int32_t value )
 {
     iENTER;
     int      len, tid;
@@ -588,7 +588,7 @@ iERR ion_binary_write_int32_with_field_sid( ION_STREAM *pstream, SID sid, int32_
     iRETURN;
 }
 
-iERR ion_binary_write_int64_with_field_sid( ION_STREAM *pstream, SID sid, int64_t value )
+iERR ion_binary_write_int64_with_field_sid( ION_STREAM *pstream, ION_SID sid, int64_t value )
 {
     iENTER;
     int      len, tid;
@@ -613,7 +613,7 @@ iERR ion_binary_write_int64_with_field_sid( ION_STREAM *pstream, SID sid, int64_
     iRETURN;
 }
 
-iERR ion_binary_write_string_with_field_sid( ION_STREAM *pstream, SID sid, ION_STRING *str)
+iERR ion_binary_write_string_with_field_sid( ION_STREAM *pstream, ION_SID sid, ION_STRING *str)
 {
     iENTER;
 
@@ -626,7 +626,7 @@ iERR ion_binary_write_string_with_field_sid( ION_STREAM *pstream, SID sid, ION_S
 iERR ion_binary_write_string_with_td_byte( ION_STREAM *pstream, ION_STRING *str )
 {
     iENTER;
-    SIZE written;
+    ION_SIZE written;
     ASSERT(pstream != NULL);
 
     if (ION_STRING_IS_NULL(str)) {
@@ -692,7 +692,7 @@ iERR ion_binary_write_var_uint_64( ION_STREAM *pstream, uint64_t value )
     // now write the bytes out from most to least significant
     // to the output stream (+1 to make it easier to understand)
     ASSERT((pb - image) < MAX_SIZE);
-    IONCHECK(ion_binary_write_byte_array(pstream, image, (SIZE)(pb - image), VAR_UINT_64_IMAGE_LENGTH));
+    IONCHECK(ion_binary_write_byte_array(pstream, image, (ION_SIZE)(pb - image), VAR_UINT_64_IMAGE_LENGTH));
 
     iRETURN;
 }
@@ -718,7 +718,7 @@ iERR ion_binary_write_uint_64(ION_STREAM *pstream, uint64_t value)
     // now write the bytes out from most to least significant
     // to the output stream
     ASSERT(((pb - image)+1) < UINT_64_IMAGE_LENGTH);
-    IONCHECK(ion_binary_write_byte_array(pstream, image, (SIZE)((pb - image)+1), UINT_64_IMAGE_LENGTH));
+    IONCHECK(ion_binary_write_byte_array(pstream, image, (ION_SIZE)((pb - image)+1), UINT_64_IMAGE_LENGTH));
     iRETURN;
 }
 
@@ -759,7 +759,7 @@ iERR ion_binary_write_var_int_64( ION_STREAM *pstream, int64_t value )
     // now write the bytes out from most to least significant
     // to the output stream (+1 to make it easier to understand)
     ASSERT((pb - image) < MAX_SIZE); // because it is limited by the number of bits in a uint64 value
-    IONCHECK(ion_binary_write_byte_array(pstream, image, (SIZE)(pb - image), VAR_INT_64_IMAGE_LENGTH));
+    IONCHECK(ion_binary_write_byte_array(pstream, image, (ION_SIZE)(pb - image), VAR_INT_64_IMAGE_LENGTH));
 
     iRETURN;
 }
@@ -798,7 +798,7 @@ iERR ion_binary_write_int_64_unsigned(ION_STREAM *pstream, uint64_t value, BOOL 
     // now write the bytes out from most to least significant
     // to the output stream
     ASSERT((pb - image) < MAX_SIZE); // because it is limited by the number of bits in a uint64 value
-    IONCHECK(ion_binary_write_byte_array(pstream, image, (SIZE)(pb - image), INT_64_IMAGE_LENGTH));
+    IONCHECK(ion_binary_write_byte_array(pstream, image, (ION_SIZE)(pb - image), INT_64_IMAGE_LENGTH));
     iRETURN;
 }
 

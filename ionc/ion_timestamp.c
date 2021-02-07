@@ -207,7 +207,7 @@ iERR _ion_timestamp_scientific_notation_fraction_to_string(char *scientific_frac
     iRETURN;
 }
 
-iERR ion_timestamp_to_string(ION_TIMESTAMP *ptime, char *buffer, SIZE buf_length, SIZE *p_length_written, decContext *pcontext)
+iERR ion_timestamp_to_string(ION_TIMESTAMP *ptime, char *buffer, ION_SIZE buf_length, ION_SIZE *p_length_written, decContext *pcontext)
 {
     iENTER;
     char   *pos = buffer;
@@ -367,7 +367,7 @@ end_of_days:
     *pos = '\0';
 
     // finally, calculate how much we wrote into the buffer
-    if (p_length_written) *p_length_written = (SIZE)(pos - buffer);   // TODO - this needs 64bit care
+    if (p_length_written) *p_length_written = (ION_SIZE)(pos - buffer);   // TODO - this needs 64bit care
 
     iRETURN;
 }
@@ -462,7 +462,7 @@ static BOOL _ion_timestamp_is_valid_day(int year, int one_based_month, int day)
 }
 
 // this expects a null terminated string
-iERR ion_timestamp_parse(ION_TIMESTAMP *ptime, char *buffer, SIZE buf_length, SIZE *p_chars_used, decContext *pcontext)
+iERR ion_timestamp_parse(ION_TIMESTAMP *ptime, char *buffer, ION_SIZE buf_length, ION_SIZE *p_chars_used, decContext *pcontext)
 {
     iENTER;
 
@@ -676,7 +676,7 @@ end_of_days:
     case '[': case ']': 
     case '{': case '}':
     case '/':
-        *p_chars_used = (SIZE)(cp - buffer);    // TODO - this needs 64bit care
+        *p_chars_used = (ION_SIZE)(cp - buffer);    // TODO - this needs 64bit care
         break;
     default:
         FAILWITH(IERR_INVALID_TIMESTAMP);

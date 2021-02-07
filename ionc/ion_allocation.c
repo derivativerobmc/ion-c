@@ -22,13 +22,13 @@
 #define VALIDATION_BAD_BOTH  6
 
 int  _dbg_ion_validation_id(BOOL head_valid, BOOL tail_valid);
-void _dbg_ion_message(const char *fn_name, void *addr, SIZE len);
-void _dbg_ion_message_validate(const char *fn_name, void *addr, SIZE len, int validation_id);
+void _dbg_ion_message(const char *fn_name, void *addr, ION_SIZE len);
+void _dbg_ion_message_validate(const char *fn_name, void *addr, ION_SIZE len, int validation_id);
 #endif
 
-void                 *_ion_alloc_with_owner_helper  (ION_ALLOCATION_CHAIN *phead, SIZE length, BOOL force_new_block);
-void                 *_ion_alloc_on_chain           (ION_ALLOCATION_CHAIN *phead, SIZE length);
-ION_ALLOCATION_CHAIN *_ion_alloc_block              (SIZE min_needed);
+void                 *_ion_alloc_with_owner_helper  (ION_ALLOCATION_CHAIN *phead, ION_SIZE length, BOOL force_new_block);
+void                 *_ion_alloc_on_chain           (ION_ALLOCATION_CHAIN *phead, ION_SIZE length);
+ION_ALLOCATION_CHAIN *_ion_alloc_block              (ION_SIZE min_needed);
 void                  _ion_free_block               (ION_ALLOCATION_CHAIN *pblock);
 
 
@@ -36,7 +36,7 @@ void                  _ion_free_block               (ION_ALLOCATION_CHAIN *pbloc
 //  public functions 
 //
 
-void *_ion_alloc_owner(SIZE len)
+void *_ion_alloc_owner(ION_SIZE len)
 {
     void                 *owner;
     ION_ALLOCATION_CHAIN *new_chain;
@@ -53,7 +53,7 @@ void *_ion_alloc_owner(SIZE len)
     return owner;
 }
 
-void *_ion_alloc_with_owner(hOWNER owner, SIZE length)
+void *_ion_alloc_with_owner(hOWNER owner, ION_SIZE length)
 {
     ION_ALLOCATION_CHAIN *phead;
     void *ptr;
@@ -106,11 +106,11 @@ iERR _ion_strdup(hOWNER owner, iSTRING dst, iSTRING src)
 //
 // internal (to this file) helper functions
 //
-void *_ion_alloc_with_owner_helper(ION_ALLOCATION_CHAIN *powner, SIZE request_length, BOOL force_new_block)
+void *_ion_alloc_with_owner_helper(ION_ALLOCATION_CHAIN *powner, ION_SIZE request_length, BOOL force_new_block)
 {
     ION_ALLOCATION_CHAIN *pblock = powner;
     BYTE                 *ptr, *next_ptr;
-    SIZE                  length;
+    ION_SIZE                  length;
 
     ASSERT(powner);
 
@@ -177,10 +177,10 @@ void *_ion_alloc_with_owner_helper(ION_ALLOCATION_CHAIN *powner, SIZE request_le
     return ptr;
 }
 
-ION_ALLOCATION_CHAIN *_ion_alloc_block(SIZE min_needed)
+ION_ALLOCATION_CHAIN *_ion_alloc_block(ION_SIZE min_needed)
 {
     ION_ALLOCATION_CHAIN *new_block;
-    SIZE                  alloc_size = min_needed + sizeof(ION_ALLOCATION_CHAIN); // subtract out the block[1]
+    ION_SIZE                  alloc_size = min_needed + sizeof(ION_ALLOCATION_CHAIN); // subtract out the block[1]
 
     if (alloc_size > g_ion_alloc_page_list.page_size) {
         // it's an oversize block - we'll ask the system for this one
@@ -221,7 +221,7 @@ void _ion_free_block(ION_ALLOCATION_CHAIN *pblock)
     return;
 }
 
-void ion_initialize_page_pool(SIZE page_size, int free_page_limit)
+void ion_initialize_page_pool(ION_SIZE page_size, int free_page_limit)
 {
     // once the page list is in use, you can't change your mind
     if (g_ion_alloc_page_list.page_size != ION_ALLOC_PAGE_POOL_PAGE_SIZE_NONE)
@@ -313,12 +313,12 @@ long debug_cmd_counter() {
 BYTE debug_pattern[] = {
     0xfe, 0xe0, 0xf1, 0xe0, 0xf0, 0xe0, 0xfe, 0xef
 };
-SIZE debug_pattern_size = sizeof(debug_pattern);
+ION_SIZE debug_pattern_size = sizeof(debug_pattern);
 
-void *debug_malloc(SIZE size, const char *file, int line) 
+void *debug_malloc(ION_SIZE size, const char *file, int line) 
 {
     BYTE   *ptr, *psize, *head, *user, *tail;
-    SIZE  adjusted_size = size + 2*debug_pattern_size * 2 + sizeof(SIZE);
+    ION_SIZE  adjusted_size = size + 2*debug_pattern_size * 2 + sizeof(ION_SIZE);
 
     assert( debug_pattern_size == 8 ); // just to make sure we're getting the right value and know what's actually happening
 
@@ -343,14 +343,14 @@ void *debug_malloc(SIZE size, const char *file, int line)
     //   user = after header pattern holds user data (variable)
     //   tail = after user data for tail pattern
     psize = ptr;
-    head  = ptr + sizeof(SIZE);
+    head  = ptr + sizeof(ION_SIZE);
     user  = head + debug_pattern_size;
     tail  = user + size;
 
     memcpy(head, debug_pattern, debug_pattern_size);
     memcpy(tail, debug_pattern, debug_pattern_size);
 
-    *((SIZE *)psize) = size;
+    *((ION_SIZE *)psize) = size;
 
     _dbg_ion_message("___MALLOC", user, size);
 
@@ -360,7 +360,7 @@ void *debug_malloc(SIZE size, const char *file, int line)
 void debug_free(const void *addr, const char *file, int line) 
 {
     BYTE    *ptr, *psize, *head, *user, *tail;
-    SIZE  size;
+    ION_SIZE  size;
     BOOL    head_valid, tail_valid;
 
     user = (BYTE *)addr;  // just to save casting all over the place
@@ -378,9 +378,9 @@ void debug_free(const void *addr, const char *file, int line)
     //   user = after header pattern holds user data (variable)
     //   tail = after user data for tail pattern
     head  = user - debug_pattern_size;
-    psize = head - sizeof(SIZE);
+    psize = head - sizeof(ION_SIZE);
     ptr   = psize;
-    size  = *((SIZE *)psize);
+    size  = *((ION_SIZE *)psize);
     tail  = user + size;
 
     malloc_inuse--;
@@ -396,11 +396,11 @@ void debug_free(const void *addr, const char *file, int line)
          , _dbg_ion_validation_id(head_valid, tail_valid)
     );
 
-    memset(ptr, 0xb0, size + 2*debug_pattern_size + sizeof(SIZE));
+    memset(ptr, 0xb0, size + 2*debug_pattern_size + sizeof(ION_SIZE));
     free(ptr);
 }
 
-void *_dbg_ion_alloc_owner(SIZE len, const char *file, int line)
+void *_dbg_ion_alloc_owner(ION_SIZE len, const char *file, int line)
 {
     long                  cmd  = debug_cmd_counter();
     void                 *owner;
@@ -416,7 +416,7 @@ void *_dbg_ion_alloc_owner(SIZE len, const char *file, int line)
     return owner;
 }
 
-void *_dbg_ion_alloc_with_owner(hOWNER owner, SIZE length, const char *file, int line)
+void *_dbg_ion_alloc_with_owner(hOWNER owner, ION_SIZE length, const char *file, int line)
 {
     long cmd  = debug_cmd_counter();
     DBG_ION_ALLOCATION_CHAIN *phead;
@@ -488,13 +488,13 @@ int _dbg_ion_validation_id(BOOL head_valid, BOOL tail_valid)
     return validation_id;
 }
 
-void _dbg_ion_message(const char *fn_name, void *addr, SIZE len)
+void _dbg_ion_message(const char *fn_name, void *addr, ION_SIZE len)
 {
     _dbg_ion_message_validate( fn_name, addr, len, VALIDATION_NONE);
 }
 
 BOOL dbg_needs_header = TRUE;
-void _dbg_ion_message_validate(const char *fn_name, void *addr, SIZE len, int validation_id)
+void _dbg_ion_message_validate(const char *fn_name, void *addr, ION_SIZE len, int validation_id)
 {
     if (dbg_needs_header) {
         dbg_needs_header = FALSE;

@@ -89,15 +89,15 @@ ION_API_EXPORT iERR ion_timestamp_get_precision(const ION_TIMESTAMP *ptime, int 
 /** Get the string format of timestamp.
  *
  */
-ION_API_EXPORT iERR ion_timestamp_to_string(ION_TIMESTAMP *ptime, char *buffer, SIZE buf_length,
-        SIZE *output_length, decContext *pcontext);
+ION_API_EXPORT iERR ion_timestamp_to_string(ION_TIMESTAMP *ptime, char *buffer, ION_SIZE buf_length,
+        ION_SIZE *output_length, decContext *pcontext);
 
 /** Parse timestamp string and construct timestamp object in ptime.
  *  This expects a null terminated string.
  *
  */
-ION_API_EXPORT iERR ion_timestamp_parse(ION_TIMESTAMP *ptime, char *buffer, SIZE length,
-        SIZE *p_characters_used, decContext *pcontext);
+ION_API_EXPORT iERR ion_timestamp_parse(ION_TIMESTAMP *ptime, char *buffer, ION_SIZE length,
+        ION_SIZE *p_characters_used, decContext *pcontext);
 
 /** Initialize ION_TIMESTAMP object with value specified in time_t
  * time_t can be constructed using time() or mktime(), timegm,

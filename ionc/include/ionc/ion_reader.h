@@ -83,12 +83,12 @@ typedef struct _ion_reader_options
     /** The max container depth defaults to 10
      *
      */
-    SIZE max_container_depth;
+    ION_SIZE max_container_depth;
 
     /** The max number of annotations on 1 value, defaults to 10
      *
      */
-    SIZE max_annotation_count;
+    ION_SIZE max_annotation_count;
 
     /** The max number number of bytes the annotations on a single value. This 
      *  is an total. How the bytes are divided among the annotations is irrelevant
@@ -96,12 +96,12 @@ typedef struct _ion_reader_options
      *  defaults to user_value_threshold (or 4096).
      *
      */
-    SIZE max_annotation_buffered;
+    ION_SIZE max_annotation_buffered;
 
     /** The size maximum size allowed for symbols, 512 bytes is the default
      *
      */
-    SIZE symbol_threshold;
+    ION_SIZE symbol_threshold;
 
     /** user value allocation threshold, max size of allocation made to process
      *  any value returned to the user, default is 4096. Includes symbol, int, 
@@ -110,19 +110,19 @@ typedef struct _ion_reader_options
      *  buffer.
      *
      */
-    SIZE user_value_threshold;
+    ION_SIZE user_value_threshold;
 
     /** The size over which long values are returned as chunks. This is only
      *  valid for string, clob and blob values as all others must be buffered
      *  up to the limit of user_value_threshold. The default is 4096.
      *
      */
-    SIZE chunk_threshold;
+    ION_SIZE chunk_threshold;
 
     /** Memory is allocated in pages owned by the primary entities it's default size is 4096
      *
      */
-    SIZE allocation_page_size;
+    ION_SIZE allocation_page_size;
 
     /** If true this will disable validation of string content which verifies the
      *  string returned is in fact a valid UTF-8 sequence.  This defaults to false.
@@ -169,7 +169,7 @@ typedef struct _ion_reader_options
  */
 ION_API_EXPORT iERR ion_reader_open_buffer(hREADER *p_hreader
                                           ,BYTE *buffer
-                                          ,SIZE buf_length
+                                          ,ION_SIZE buf_length
                                           ,ION_READER_OPTIONS *p_options);
 
 /** Create hREADER object, and associate it with the stream for reading.
@@ -197,7 +197,7 @@ ION_API_EXPORT iERR ion_reader_open_buffer(hREADER *p_hreader
     {
         iENTER;
         TEST_FILE *tfile;
-        SIZE len;
+        ION_SIZE len;
         tfile = (TEST_FILE *)pstream->handler_state;
         pstream->curr = tfile->buffer;
         len = fread( tfile->buffer, sizeof(*tfile->buffer), tfile->block_size, g_test_file.in );
@@ -291,7 +291,7 @@ ION_API_EXPORT iERR ion_reader_get_catalog             (hREADER hreader, hCATALO
  */
 ION_API_EXPORT iERR ion_reader_seek                (hREADER  hreader
                                                    ,POSITION offset
-                                                   ,SIZE     length);
+                                                   ,ION_SIZE     length);
 /** set the current symbol table to the table passed in.  This 
  *  can be used to reset the readers symbol
  *  table is you wish to seek in a stream which contains multiple
@@ -320,7 +320,7 @@ ION_API_EXPORT iERR ion_reader_get_value_offset    (hREADER   hreader
  *  Ion data.
  */
 ION_API_EXPORT iERR ion_reader_get_value_length    (hREADER  hreader
-                                                   ,SIZE   *p_length);
+                                                   ,ION_SIZE   *p_length);
 /** returns the current symbol table the value the reader is currently
  *  positioned on.  This can be used to reset the readers symbol
  *  table is you wish to seek in a stream which contains multiple
@@ -336,7 +336,7 @@ ION_API_EXPORT iERR ion_reader_get_symbol_table    (hREADER   hreader
 ION_API_EXPORT iERR ion_reader_next                (hREADER hreader, ION_TYPE *p_value_type);
 ION_API_EXPORT iERR ion_reader_step_in             (hREADER hreader);
 ION_API_EXPORT iERR ion_reader_step_out            (hREADER hreader);
-ION_API_EXPORT iERR ion_reader_get_depth           (hREADER hreader, SIZE *p_depth);
+ION_API_EXPORT iERR ion_reader_get_depth           (hREADER hreader, ION_SIZE *p_depth);
 
 /**
  * Returns the type of the current value, or tid_none if no value has been assigned. (before next() is called)
@@ -348,9 +348,9 @@ ION_API_EXPORT iERR ion_reader_is_null             (hREADER hreader, BOOL *p_is_
 ION_API_EXPORT iERR ion_reader_is_in_struct        (hREADER preader, BOOL *p_is_in_struct);
 ION_API_EXPORT iERR ion_reader_get_field_name      (hREADER hreader, iSTRING p_str);
 ION_API_EXPORT iERR ion_reader_get_field_name_symbol(hREADER hreader, ION_SYMBOL **p_psymbol);
-ION_API_EXPORT iERR ion_reader_get_annotations     (hREADER hreader, iSTRING p_strs, SIZE max_count, SIZE *p_count);
-ION_API_EXPORT iERR ion_reader_get_annotation_symbols(hREADER hreader, ION_SYMBOL *p_symbols, SIZE max_count, SIZE *p_count);
-ION_API_EXPORT iERR ion_reader_get_annotation_count(hREADER hreader, SIZE *p_count);
+ION_API_EXPORT iERR ion_reader_get_annotations     (hREADER hreader, iSTRING p_strs, ION_SIZE max_count, ION_SIZE *p_count);
+ION_API_EXPORT iERR ion_reader_get_annotation_symbols(hREADER hreader, ION_SYMBOL *p_symbols, ION_SIZE max_count, ION_SIZE *p_count);
+ION_API_EXPORT iERR ion_reader_get_annotation_count(hREADER hreader, ION_SIZE *p_count);
 ION_API_EXPORT iERR ion_reader_get_an_annotation   (hREADER hreader, int idx, iSTRING p_strs);
 ION_API_EXPORT iERR ion_reader_get_an_annotation_symbol(hREADER hreader, int idx, ION_SYMBOL *p_symbol);
 ION_API_EXPORT iERR ion_reader_read_null           (hREADER hreader, ION_TYPE *p_value);
@@ -411,15 +411,15 @@ ION_API_EXPORT iERR ion_reader_read_ion_symbol(hREADER hreader, ION_SYMBOL *p_sy
  *
  * @param p_value receives the string information.
  */
-ION_API_EXPORT iERR ion_reader_get_string_length   (hREADER hreader, SIZE *p_length); // note this may require the string value to be loaded in memory
+ION_API_EXPORT iERR ion_reader_get_string_length   (hREADER hreader, ION_SIZE *p_length); // note this may require the string value to be loaded in memory
 ION_API_EXPORT iERR ion_reader_read_string         (hREADER hreader, iSTRING p_value);
-ION_API_EXPORT iERR ion_reader_read_partial_string (hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length);
+ION_API_EXPORT iERR ion_reader_read_partial_string (hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length);
 
 // TODO: move this to get_value_size, get_value_bytes, get_value_chuck that can read
 //       string, long int, decimal and timestamp values in addition to blob and clob
-ION_API_EXPORT iERR ion_reader_get_lob_size          (hREADER hreader, SIZE *p_length); // this may require the lob value to be loaded in memroy
-ION_API_EXPORT iERR ion_reader_read_lob_bytes        (hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length);
-ION_API_EXPORT iERR ion_reader_read_lob_partial_bytes(hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length);
+ION_API_EXPORT iERR ion_reader_get_lob_size          (hREADER hreader, ION_SIZE *p_length); // this may require the lob value to be loaded in memroy
+ION_API_EXPORT iERR ion_reader_read_lob_bytes        (hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length);
+ION_API_EXPORT iERR ion_reader_read_lob_partial_bytes(hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length);
 
 ION_API_EXPORT iERR ion_reader_get_position          (hREADER hreader, int64_t *p_bytes, int32_t *p_line, int32_t *p_offset);
 

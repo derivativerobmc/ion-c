@@ -22,7 +22,7 @@
 #include <string.h>
 //#include "hashfn.h"
 
-iERR _ion_symbol_table_local_find_by_sid(ION_SYMBOL_TABLE *symtab, SID sid, ION_SYMBOL **p_sym);
+iERR _ion_symbol_table_local_find_by_sid(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_SYMBOL **p_sym);
 
 iERR ion_symbol_table_open(hSYMTAB *p_hsymtab, hOWNER owner)
 {
@@ -236,7 +236,7 @@ static char gSystemSymbolMemory[kIonSystemSymbolMemorySize];
 void* smallLocalAllocationBlock()
 {
     ION_ALLOCATION_CHAIN *new_block = (ION_ALLOCATION_CHAIN*)gSystemSymbolMemory;
-    SIZE                  alloc_size = kIonSystemSymbolMemorySize;
+    ION_SIZE                  alloc_size = kIonSystemSymbolMemorySize;
 
     new_block->size     = alloc_size;
 
@@ -293,7 +293,7 @@ iERR _ion_symbol_table_local_load_import_list(ION_READER *preader, hOWNER owner,
     ION_SYMBOL_TABLE_IMPORT *import;
     ION_TYPE   type;
     ION_STRING str;
-    SID        fld_sid;
+    ION_SID        fld_sid;
 
     ASSERT(preader->_catalog != NULL);
 
@@ -378,7 +378,7 @@ iERR _ion_symbol_table_local_load_symbol_list(ION_READER *preader, hOWNER owner,
         IONCHECK(_ion_reader_next_helper(preader, &type));
         if (type == tid_EOF) break;
 
-        // NOTE: any value in the symbols list that is null or is not a string is treated as a valid SID mapping with
+        // NOTE: any value in the symbols list that is null or is not a string is treated as a valid ION_SID mapping with
         // unknown text.
 
         ION_STRING_INIT(&str);
@@ -423,10 +423,10 @@ iERR ion_symbol_table_load(hREADER hreader, hOWNER owner, hSYMTAB *p_hsymtab)
     iRETURN;
 }
 
-iERR _ion_symbol_table_get_field_sid_force(ION_READER *preader, SID *fld_sid)
+iERR _ion_symbol_table_get_field_sid_force(ION_READER *preader, ION_SID *fld_sid)
 {
     iENTER;
-    SID sid;
+    ION_SID sid;
     ION_STRING *field_name;
 
     IONCHECK(_ion_reader_get_field_sid_helper(preader, &sid));
@@ -485,7 +485,7 @@ iERR _ion_symbol_table_load_helper(ION_READER *preader, hOWNER owner, ION_SYMBOL
     ION_SYMBOL_TABLE_IMPORT *import;
     ION_SYMBOL              *symbol;
     int                      version = 0;
-    SID                      fld_sid, sid, max_id = 0;
+    ION_SID                      fld_sid, sid, max_id = 0;
     BOOL                     is_shared_table, processed_symbols = FALSE, processed_imports = FALSE;
     ION_STRING               str, name;
     ION_COLLECTION_CURSOR    import_cursor, symbol_cursor;
@@ -542,7 +542,7 @@ iERR _ion_symbol_table_load_helper(ION_READER *preader, hOWNER owner, ION_SYMBOL
         case ION_SYS_SID_IMPORTS:  /* "imports" */
             if (processed_imports) {
                 // Since struct order is not guaranteed, duplicate imports lists could be processed in any order,
-                // leading to potentially-incorrect SID mappings.
+                // leading to potentially-incorrect ION_SID mappings.
                 FAILWITHMSG(IERR_INVALID_SYMBOL_TABLE, "Duplicate imports declaration in symbol table.");
             }
             if (type == tid_LIST) {
@@ -572,7 +572,7 @@ iERR _ion_symbol_table_load_helper(ION_READER *preader, hOWNER owner, ION_SYMBOL
         case ION_SYS_SID_SYMBOLS:  /* "symbols" */
             if (processed_symbols) {
                 // Since struct order is not guaranteed, duplicate symbols lists could be processed in any order,
-                // leading to potentially-incorrect SID mappings.
+                // leading to potentially-incorrect ION_SID mappings.
                 FAILWITHMSG(IERR_INVALID_SYMBOL_TABLE, "Duplicate symbols declaration in symbol table.");
             }
             if (type == tid_LIST) {
@@ -659,7 +659,7 @@ iERR _ion_symbol_table_unload_helper(ION_SYMBOL_TABLE *symtab, ION_WRITER *pwrit
     iENTER;
     ION_SYMBOL_TABLE_IMPORT *import;
     ION_SYMBOL              *sym;
-    SID                      annotation;
+    ION_SID                      annotation;
     ION_COLLECTION_CURSOR    symbol_cursor, import_cursor;
     ION_SYMBOL_TABLE_TYPE    table_type;
 
@@ -893,7 +893,7 @@ iERR _ion_symbol_table_get_version_helper(ION_SYMBOL_TABLE *symtab, int32_t *p_v
     return IERR_OK;
 }
 
-iERR ion_symbol_table_get_max_sid(hSYMTAB hsymtab, SID *p_max_id)
+iERR ion_symbol_table_get_max_sid(hSYMTAB hsymtab, ION_SID *p_max_id)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -908,7 +908,7 @@ iERR ion_symbol_table_get_max_sid(hSYMTAB hsymtab, SID *p_max_id)
     iRETURN;
 }
 
-iERR _ion_symbol_table_get_max_sid_helper(ION_SYMBOL_TABLE *symtab, SID *p_max_id)
+iERR _ion_symbol_table_get_max_sid_helper(ION_SYMBOL_TABLE *symtab, ION_SID *p_max_id)
 {
     int max_id;
 
@@ -987,7 +987,7 @@ iERR _ion_symbol_table_set_version_helper(ION_SYMBOL_TABLE *symtab, int32_t vers
     iRETURN;
 }
 
-iERR ion_symbol_table_set_max_sid(hSYMTAB hsymtab, SID max_id)
+iERR ion_symbol_table_set_max_sid(hSYMTAB hsymtab, ION_SID max_id)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1002,7 +1002,7 @@ iERR ion_symbol_table_set_max_sid(hSYMTAB hsymtab, SID max_id)
     iRETURN;
 }
 
-iERR _ion_symbol_table_set_max_sid_helper(ION_SYMBOL_TABLE *symtab, SID max_id)
+iERR _ion_symbol_table_set_max_sid_helper(ION_SYMBOL_TABLE *symtab, ION_SID max_id)
 {
     iENTER;
 
@@ -1166,12 +1166,12 @@ iERR _ion_symbol_table_local_incorporate_symbols(ION_SYMBOL_TABLE *symtab, ION_S
     iRETURN;
 }
 
-iERR _ion_symbol_table_local_find_by_name(ION_SYMBOL_TABLE *symtab, ION_STRING *name, SID *p_sid, ION_SYMBOL **p_sym)
+iERR _ion_symbol_table_local_find_by_name(ION_SYMBOL_TABLE *symtab, ION_STRING *name, ION_SID *p_sid, ION_SYMBOL **p_sym)
 {
     iENTER;
     ION_COLLECTION_CURSOR   symbol_cursor;
     ION_SYMBOL             *sym;
-    SID                     sid;
+    ION_SID                     sid;
 
     if(ION_STRING_IS_NULL(name)) {
         FAILWITH(IERR_NULL_VALUE);
@@ -1214,7 +1214,7 @@ iERR _ion_symbol_table_local_find_by_name(ION_SYMBOL_TABLE *symtab, ION_STRING *
     iRETURN;
 }
 
-iERR ion_symbol_table_find_by_name(hSYMTAB hsymtab, iSTRING name, SID *p_sid)
+iERR ion_symbol_table_find_by_name(hSYMTAB hsymtab, iSTRING name, ION_SID *p_sid)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1232,9 +1232,9 @@ iERR ion_symbol_table_find_by_name(hSYMTAB hsymtab, iSTRING name, SID *p_sid)
     iRETURN;
 }
 
-iERR _ion_symbol_table_parse_possible_symbol_identifier(ION_SYMBOL_TABLE *symtab, ION_STRING *name, SID *p_sid, ION_SYMBOL **p_sym, BOOL *p_is_symbol_identifier) {
+iERR _ion_symbol_table_parse_possible_symbol_identifier(ION_SYMBOL_TABLE *symtab, ION_STRING *name, ION_SID *p_sid, ION_SYMBOL **p_sym, BOOL *p_is_symbol_identifier) {
     iENTER;
-    SID sid = UNKNOWN_SID;
+    ION_SID sid = UNKNOWN_SID;
     ION_SYMBOL *sym = NULL;
     int ii, c;
     BOOL is_symbol_identifier = FALSE;
@@ -1257,14 +1257,14 @@ iERR _ion_symbol_table_parse_possible_symbol_identifier(ION_SYMBOL_TABLE *symtab
         }
         is_symbol_identifier = TRUE;
         if (sid == 0 || sid > symtab->max_id) {
-            // SID 0 is not in any symbol table, but is available in all symbol table contexts.
-            // If the requested SID is out of range for the current symtab context, an error will be raised when the
+            // ION_SID 0 is not in any symbol table, but is available in all symbol table contexts.
+            // If the requested ION_SID is out of range for the current symtab context, an error will be raised when the
             // user retrieves the symbol token.
             _ion_symbol_table_allocate_symbol_unknown_text(symtab->owner, sid, &sym);
         }
         else if (p_sym) {
             IONCHECK(_ion_symbol_table_find_symbol_by_sid_helper(symtab, sid, &sym));
-            ASSERT(sym != NULL); // This SID is within range. It MUST have a non-NULL symbol.
+            ASSERT(sym != NULL); // This ION_SID is within range. It MUST have a non-NULL symbol.
             if (ION_STRING_IS_NULL(&sym->value) && ION_SYMBOL_IMPORT_LOCATION_IS_NULL(sym) && sym->sid >= symtab->min_local_id) {
                 // This is a local symbol with unknown text, which is equivalent to symbol zero.
                 sid = 0;
@@ -1278,12 +1278,12 @@ done:
     iRETURN;
 }
 
-iERR _ion_symbol_table_find_by_name_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, SID *p_sid, ION_SYMBOL **p_sym,
+iERR _ion_symbol_table_find_by_name_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, ION_SID *p_sid, ION_SYMBOL **p_sym,
                                            BOOL symbol_identifiers_as_sids)
 {
     iENTER;
     ION_SYMBOL_TABLE        *imported;
-    SID                      sid = UNKNOWN_SID;
+    ION_SID                      sid = UNKNOWN_SID;
     ION_SYMBOL_TABLE_IMPORT *imp;
     ION_COLLECTION_CURSOR    import_cursor;
     int32_t                  offset;
@@ -1341,7 +1341,7 @@ done:
     iRETURN;
 }
 
-iERR _ion_symbol_table_local_find_by_sid(ION_SYMBOL_TABLE *symtab, SID sid, ION_SYMBOL **p_sym)
+iERR _ion_symbol_table_local_find_by_sid(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_SYMBOL **p_sym)
 {
     iENTER;
     ION_SYMBOL              *sym;
@@ -1382,7 +1382,7 @@ iERR _ion_symbol_table_local_find_by_sid(ION_SYMBOL_TABLE *symtab, SID sid, ION_
     iRETURN;
 }
 
-iERR ion_symbol_table_find_by_sid(hSYMTAB hsymtab, SID sid, iSTRING *p_name)
+iERR ion_symbol_table_find_by_sid(hSYMTAB hsymtab, ION_SID sid, iSTRING *p_name)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1402,7 +1402,7 @@ iERR ion_symbol_table_find_by_sid(hSYMTAB hsymtab, SID sid, iSTRING *p_name)
     iRETURN;
 }
 
-iERR _ion_symbol_table_find_symbol_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID sid, ION_SYMBOL **p_sym)
+iERR _ion_symbol_table_find_symbol_by_sid_helper(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_SYMBOL **p_sym)
 {
     iENTER;
     ION_SYMBOL              *sym = NULL;
@@ -1433,7 +1433,7 @@ iERR _ion_symbol_table_find_symbol_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID s
                         IONCHECK(_ion_symbol_table_local_find_by_sid(imported, sid - offset, &sym));
                     }
                     if (sym == NULL) {
-                        // The SID is in range, but either the shared symbol table is not found, or the SID refers to a
+                        // The ION_SID is in range, but either the shared symbol table is not found, or the ION_SID refers to a
                         // NULL slot in the shared symbol table. This symbol has unknown text.
                         _ion_symbol_table_allocate_symbol_unknown_text(symtab->owner, sid, &sym);
                         ION_STRING_ASSIGN(&sym->import_location.name, &imp->descriptor.name);
@@ -1455,7 +1455,7 @@ iERR _ion_symbol_table_find_symbol_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID s
     iRETURN;
 }
 
-iERR _ion_symbol_table_find_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID sid, ION_STRING **p_name)
+iERR _ion_symbol_table_find_by_sid_helper(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_STRING **p_name)
 {
     iENTER;
     ION_SYMBOL              *sym = NULL;
@@ -1475,7 +1475,7 @@ iERR _ion_symbol_table_find_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID sid, ION
     iRETURN;
 }
 
-iERR _ion_symbol_table_get_unknown_symbol_name(ION_SYMBOL_TABLE *symtab, SID sid, ION_STRING **p_name)
+iERR _ion_symbol_table_get_unknown_symbol_name(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_STRING **p_name)
 {
     iENTER;
     int32_t                  len;
@@ -1493,7 +1493,7 @@ iERR _ion_symbol_table_get_unknown_symbol_name(ION_SYMBOL_TABLE *symtab, SID sid
         // This is a local symbol with unknown text, which is equivalent to symbol zero.
         sid = 0;
     }
-    // A symbol name was not found, but the SID is within range for the current symbol table context -
+    // A symbol name was not found, but the ION_SID is within range for the current symbol table context -
     // make a symbol identifier of the form $<int> to represent the name
     temp[0] = '$';
     len = (int32_t)strlen(_ion_itoa_10(sid, temp + 1, sizeof(temp)-1)) + 1; // we're writing into the 2nd byte
@@ -1508,9 +1508,9 @@ iERR _ion_symbol_table_get_unknown_symbol_name(ION_SYMBOL_TABLE *symtab, SID sid
 }
 
 /**
- * Retrieve the text for the given SID. If the text is unknown, return a symbol identifier in the form $<int>.
+ * Retrieve the text for the given ION_SID. If the text is unknown, return a symbol identifier in the form $<int>.
  */
-iERR _ion_symbol_table_find_by_sid_force(ION_SYMBOL_TABLE *symtab, SID sid, ION_STRING **p_name, BOOL *p_is_symbol_identifier)
+iERR _ion_symbol_table_find_by_sid_force(ION_SYMBOL_TABLE *symtab, ION_SID sid, ION_STRING **p_name, BOOL *p_is_symbol_identifier)
 {
     iENTER;
     BOOL is_symbol_identifier = FALSE;
@@ -1525,7 +1525,7 @@ iERR _ion_symbol_table_find_by_sid_force(ION_SYMBOL_TABLE *symtab, SID sid, ION_
     iRETURN;
 }
 
-iERR ion_symbol_table_is_symbol_known(hSYMTAB hsymtab, SID sid, BOOL *p_is_known)
+iERR ion_symbol_table_is_symbol_known(hSYMTAB hsymtab, ION_SID sid, BOOL *p_is_known)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1541,7 +1541,7 @@ iERR ion_symbol_table_is_symbol_known(hSYMTAB hsymtab, SID sid, BOOL *p_is_known
     iRETURN;
 }
 
-iERR _ion_symbol_table_is_symbol_known_helper(ION_SYMBOL_TABLE *symtab, SID sid, BOOL *p_is_known)
+iERR _ion_symbol_table_is_symbol_known_helper(ION_SYMBOL_TABLE *symtab, ION_SID sid, BOOL *p_is_known)
 {
     iENTER;
     ION_STRING *pname = NULL;
@@ -1556,7 +1556,7 @@ iERR _ion_symbol_table_is_symbol_known_helper(ION_SYMBOL_TABLE *symtab, SID sid,
 }
 
 // get symbols by sid, iterate from 1 to max_sid - returns all symbol
-iERR ion_symbol_table_get_symbol(hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_sym)
+iERR ion_symbol_table_get_symbol(hSYMTAB hsymtab, ION_SID sid, ION_SYMBOL **p_sym)
 {
     iENTER;
     ION_SYMBOL *sym;
@@ -1574,7 +1574,7 @@ iERR ion_symbol_table_get_symbol(hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_sym)
 }
 
 // get symbols by sid, iterate from 1 to max_sid - returns only locally defined symbols
-iERR ion_symbol_table_get_local_symbol(hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_sym)
+iERR ion_symbol_table_get_local_symbol(hSYMTAB hsymtab, ION_SID sid, ION_SYMBOL **p_sym)
 {
     iENTER;
     ION_SYMBOL *sym;
@@ -1592,7 +1592,7 @@ iERR ion_symbol_table_get_local_symbol(hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_
 }
 
 
-iERR ion_symbol_table_add_symbol(hSYMTAB hsymtab, iSTRING name, SID *p_sid)
+iERR ion_symbol_table_add_symbol(hSYMTAB hsymtab, iSTRING name, ION_SID *p_sid)
 {
     iENTER;
     ION_SYMBOL_TABLE *symtab;
@@ -1608,10 +1608,10 @@ iERR ion_symbol_table_add_symbol(hSYMTAB hsymtab, iSTRING name, SID *p_sid)
     iRETURN;
 }
 
-iERR _ion_symbol_table_add_symbol_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, SID *p_sid)
+iERR _ion_symbol_table_add_symbol_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, ION_SID *p_sid)
 {
     iENTER;
-    SID         sid;
+    ION_SID         sid;
     ION_SYMBOL *sym;
 
     ASSERT(symtab != NULL);
@@ -1633,11 +1633,11 @@ iERR _ion_symbol_table_add_symbol_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *n
     iRETURN;
 }
 
-iERR _ion_symbol_table_local_add_symbol_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, SID sid, ION_SYMBOL **p_psym)
+iERR _ion_symbol_table_local_add_symbol_helper(ION_SYMBOL_TABLE *symtab, ION_STRING *name, ION_SID sid, ION_SYMBOL **p_psym)
 {
     iENTER;
     ION_SYMBOL *sym;
-    SIZE        trailing_bytes = 0;
+    ION_SIZE        trailing_bytes = 0;
 
     ASSERT(symtab != NULL);
     ASSERT(sid > UNKNOWN_SID);
@@ -1706,7 +1706,7 @@ iERR _ion_symbol_table_close_helper(ION_SYMBOL_TABLE *symtab)
     iRETURN;
 }
 
-BOOL _ion_symbol_table_sid_is_IVM(SID sid) {
+BOOL _ion_symbol_table_sid_is_IVM(ION_SID sid) {
     // If more IVMs are added to support future versions of Ion, they need to be added here.
     return sid == ION_SYS_SID_IVM;
 }
@@ -1789,7 +1789,7 @@ BOOL _ion_symbol_needs_quotes(ION_STRING *p_str, BOOL symbol_identifiers_need_qu
 {
     char *start, *limit, *cp;
     BOOL  is_possible_keyword = FALSE;
-    SIZE length;
+    ION_SIZE length;
 
     if (!p_str || !p_str->value) return FALSE;
 
@@ -2000,8 +2000,8 @@ iERR _ion_symbol_table_initialize_indices_helper(ION_SYMBOL_TABLE *symtab)
             symtab->by_id[sym->sid - symtab->min_local_id] = sym;
             err = _ion_index_insert(&symtab->by_name, sym, sym);
             if (err == IERR_KEY_ALREADY_EXISTS) {
-                // This symbol has previously been declared. That's fine; when accessed by name, the SID from the first
-                // declaration (i.e. the lowest SID) will be returned. This is consistent with the spec.
+                // This symbol has previously been declared. That's fine; when accessed by name, the ION_SID from the first
+                // declaration (i.e. the lowest ION_SID) will be returned. This is consistent with the spec.
                 err = IERR_OK;
             }
             IONCHECK(err);
@@ -2070,7 +2070,7 @@ iERR _ion_symbol_table_index_insert_helper(ION_SYMBOL_TABLE *symtab, ION_SYMBOL 
 {
     iENTER;
     int32_t new_count, old_count;
-    SID adjusted_sid;
+    ION_SID adjusted_sid;
 
     ASSERT(symtab->is_locked == FALSE);
     ASSERT(INDEX_IS_ACTIVE(symtab));
@@ -2093,8 +2093,8 @@ iERR _ion_symbol_table_index_insert_helper(ION_SYMBOL_TABLE *symtab, ION_SYMBOL 
     if (!ION_STRING_IS_NULL(&sym->value)) { // Symbols with unknown text can't be looked up by name.
         err = _ion_index_insert(&symtab->by_name, sym, sym);
         if (err == IERR_KEY_ALREADY_EXISTS) {
-            // A symbol with this text has already been defined. That is fine: when looked up by name, the lowest SID
-            // will be returned (in accordance with the spec). When looked up by SID, both mappings will return the
+            // A symbol with this text has already been defined. That is fine: when looked up by name, the lowest ION_SID
+            // will be returned (in accordance with the spec). When looked up by ION_SID, both mappings will return the
             // correct text.
             err = IERR_OK;
         }
@@ -2142,7 +2142,7 @@ ION_SYMBOL *_ion_symbol_table_index_find_by_name_helper(ION_SYMBOL_TABLE *symtab
     return found_sym;
 }
 
-void _ion_symbol_table_allocate_symbol_unknown_text(hOWNER owner, SID sid, ION_SYMBOL **p_symbol)
+void _ion_symbol_table_allocate_symbol_unknown_text(hOWNER owner, ION_SID sid, ION_SYMBOL **p_symbol)
 {
     ASSERT(p_symbol);
     ASSERT(owner != NULL);
@@ -2157,7 +2157,7 @@ void _ion_symbol_table_allocate_symbol_unknown_text(hOWNER owner, SID sid, ION_S
     *p_symbol = symbol;
 }
 
-ION_SYMBOL *_ion_symbol_table_index_find_by_sid_helper(ION_SYMBOL_TABLE *symtab, SID sid)
+ION_SYMBOL *_ion_symbol_table_index_find_by_sid_helper(ION_SYMBOL_TABLE *symtab, ION_SID sid)
 {
     ION_SYMBOL *found_sym;
 
@@ -2235,7 +2235,7 @@ iERR ion_symbol_is_equal(ION_SYMBOL *lhs, ION_SYMBOL *rhs, BOOL *is_equal)
         }
     }
     else if (ION_STRING_EQUALS(&lhs->value, &rhs->value)) {
-        // Both inputs have the same text. They are equivalent regardless of SID or import location.
+        // Both inputs have the same text. They are equivalent regardless of ION_SID or import location.
         *is_equal = TRUE;
     }
     else {

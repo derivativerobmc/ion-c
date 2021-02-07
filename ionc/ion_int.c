@@ -30,7 +30,7 @@
 //
 // There are likely to be problems if the integer gets
 // up in to the 2 gig bits size, since a number of the
-// routines calculate "bit count" using a SIZE or perhaps
+// routines calculate "bit count" using a ION_SIZE or perhaps
 // an int32_t or an int.  (this isn't likely to be the
 // biggest issue, but it's known)
 //
@@ -94,7 +94,7 @@ iERR ion_int_copy(ION_INT *dst, ION_INT *src, void *owner)
     if (src->_digits) {
         digits_len = dst->_len * sizeof(II_DIGIT);
         if (dst->_owner) {
-            dst->_digits = ion_alloc_with_owner(dst->_owner, (SIZE)digits_len);
+            dst->_digits = ion_alloc_with_owner(dst->_owner, (ION_SIZE)digits_len);
         }
         else {
             dst->_digits = ion_xalloc(digits_len);
@@ -147,8 +147,8 @@ iERR ion_int_compare(ION_INT *iint1, ION_INT *iint2, int *p_result)
 {
     iENTER;
     BOOL      is_null1, is_null2;
-    SIZE    bits1, bits2;
-    SIZE    count;
+    ION_SIZE    bits1, bits2;
+    ION_SIZE    count;
     II_DIGIT  digit1, digit2;
     II_DIGIT *digits1, *digits2;
 
@@ -222,7 +222,7 @@ iERR ion_int_signum(ION_INT *iint, int32_t *p_signum) // signum = function(t) {
 }
 
 
-iERR ion_int_highest_bit_set(ION_INT *iint, SIZE *p_pos)
+iERR ion_int_highest_bit_set(ION_INT *iint, ION_SIZE *p_pos)
 {
     iENTER;
     
@@ -246,7 +246,7 @@ iERR ion_int_from_string(ION_INT *iint, const iSTRING p_str)
     iRETURN;
 }
 
-iERR ion_int_from_chars(ION_INT *iint, const char *p_chars, SIZE char_limit)
+iERR ion_int_from_chars(ION_INT *iint, const char *p_chars, ION_SIZE char_limit)
 {
     iENTER;
     
@@ -257,7 +257,7 @@ iERR ion_int_from_chars(ION_INT *iint, const char *p_chars, SIZE char_limit)
     iRETURN;
 }
 
-iERR _ion_int_from_chars_helper(ION_INT *iint, const char *str, SIZE len)
+iERR _ion_int_from_chars_helper(ION_INT *iint, const char *str, ION_SIZE len)
 {
     iENTER;
     const char *cp, *end;
@@ -297,7 +297,7 @@ iERR _ion_int_from_chars_helper(ION_INT *iint, const char *str, SIZE len)
         FAILWITH(IERR_INVALID_SYNTAX);
     }
     
-    decimal_digits = (SIZE)(end - cp); // since these live within a string whose length is of type SIZE
+    decimal_digits = (ION_SIZE)(end - cp); // since these live within a string whose length is of type ION_SIZE
     if (*cp == '0') {
         if (decimal_digits > 1 && *(cp+1) == '0') {
             // only 1 leading zero
@@ -306,8 +306,8 @@ iERR _ion_int_from_chars_helper(ION_INT *iint, const char *str, SIZE len)
         decimal_digits--; // we don't count the leading zero for this, it doesn't add bits
     }
     
-    bits = (SIZE)((II_BITS_PER_DEC_DIGIT * decimal_digits) + 1);
-    ii_length = (SIZE)(((double)(bits - 1) / II_BITS_PER_II_DIGIT) + 1);
+    bits = (ION_SIZE)((II_BITS_PER_DEC_DIGIT * decimal_digits) + 1);
+    ii_length = (ION_SIZE)(((double)(bits - 1) / II_BITS_PER_II_DIGIT) + 1);
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
     
     is_zero = TRUE;
@@ -355,7 +355,7 @@ iERR ion_int_from_binary_string(ION_INT *iint, const iSTRING p_str)
     iRETURN;
 }
 
-iERR ion_int_from_hex_chars(ION_INT *iint, const char *p_chars, SIZE char_limit)
+iERR ion_int_from_hex_chars(ION_INT *iint, const char *p_chars, ION_SIZE char_limit)
 {
     iENTER;
 
@@ -365,7 +365,7 @@ iERR ion_int_from_hex_chars(ION_INT *iint, const char *p_chars, SIZE char_limit)
 
     iRETURN;
 }
-iERR ion_int_from_binary_chars(ION_INT *iint, const char *p_chars, SIZE char_limit)
+iERR ion_int_from_binary_chars(ION_INT *iint, const char *p_chars, ION_SIZE char_limit)
 {
     iENTER;
 
@@ -398,13 +398,13 @@ static unsigned int _ion_int_binary_digit_values[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 112-127
 };
 
-iERR _ion_int_from_radix_chars_helper(ION_INT *iint, const char *str, SIZE len, unsigned int *digit_values, unsigned int base, unsigned int bits_per_digit, const char *radix_chars)
+iERR _ion_int_from_radix_chars_helper(ION_INT *iint, const char *str, ION_SIZE len, unsigned int *digit_values, unsigned int base, unsigned int bits_per_digit, const char *radix_chars)
 {
     iENTER;
     const char *cp, *end;
     char       c;
     int        signum = 1;
-    SIZE       num_digits, bits, ii_length;
+    ION_SIZE       num_digits, bits, ii_length;
     BOOL       is_zero;
     II_DIGIT  *digits, d;
 
@@ -439,9 +439,9 @@ iERR _ion_int_from_radix_chars_helper(ION_INT *iint, const char *str, SIZE len, 
         if (cp >= end) break;
     }
 
-    num_digits = (SIZE)(end - cp); // since strings are limited to length SIZE
-    bits = (SIZE)((bits_per_digit * num_digits) + 1);
-    ii_length = (SIZE)(((double)(bits - 1) / II_BITS_PER_II_DIGIT) + 1);
+    num_digits = (ION_SIZE)(end - cp); // since strings are limited to length ION_SIZE
+    bits = (ION_SIZE)((bits_per_digit * num_digits) + 1);
+    ii_length = (ION_SIZE)(((double)(bits - 1) / II_BITS_PER_II_DIGIT) + 1);
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
 
     is_zero = TRUE;
@@ -470,14 +470,14 @@ bad_syntax:
     iRETURN;
 }
 
-iERR _ion_int_from_hex_chars_helper(ION_INT *iint, const char *str, SIZE len)
+iERR _ion_int_from_hex_chars_helper(ION_INT *iint, const char *str, ION_SIZE len)
 {
     iENTER;
     IONCHECK(_ion_int_from_radix_chars_helper(iint, str, len, _ion_int_hex_digit_values, II_HEX_BASE, II_BITS_PER_HEX_DIGIT, II_HEX_RADIX_CHARS));
     iRETURN;
 }
 
-iERR _ion_int_from_binary_chars_helper(ION_INT *iint, const char *str, SIZE len)
+iERR _ion_int_from_binary_chars_helper(ION_INT *iint, const char *str, ION_SIZE len)
 {
     iENTER;
     IONCHECK(_ion_int_from_radix_chars_helper(iint, str, len, _ion_int_binary_digit_values, II_BINARY_BASE, II_BITS_PER_BINARY_DIGIT, II_BINARY_RADIX_CHARS));
@@ -485,11 +485,11 @@ iERR _ion_int_from_binary_chars_helper(ION_INT *iint, const char *str, SIZE len)
 }
 
 
-iERR ion_int_from_bytes(ION_INT *iint, BYTE *buf, SIZE limit)
+iERR ion_int_from_bytes(ION_INT *iint, BYTE *buf, ION_SIZE limit)
 {
     iENTER;
     BOOL     is_neg, is_zero, may_overflow;
-    SIZE   byte_idx, byte_count, bits, ii_length;
+    ION_SIZE   byte_idx, byte_count, bits, ii_length;
     BYTE     byte;
 
     IONCHECK(_ion_int_validate_arg_with_ptr(iint, buf));
@@ -544,7 +544,7 @@ iERR ion_int_from_bytes(ION_INT *iint, BYTE *buf, SIZE limit)
         // to do that
         bits++;
     }
-    ii_length = (SIZE)(((bits - 1) / II_BITS_PER_II_DIGIT)+1);
+    ii_length = (ION_SIZE)(((bits - 1) / II_BITS_PER_II_DIGIT)+1);
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
 
     is_zero = _ion_int_from_bytes_helper(iint, buf, byte_idx, limit, is_neg, (byte_idx == 0));
@@ -566,11 +566,11 @@ iERR ion_int_from_bytes(ION_INT *iint, BYTE *buf, SIZE limit)
 }
 
 
-iERR ion_int_from_abs_bytes(ION_INT *iint, BYTE *buf, SIZE limit, BOOL is_negative)
+iERR ion_int_from_abs_bytes(ION_INT *iint, BYTE *buf, ION_SIZE limit, BOOL is_negative)
 {
     iENTER;
     BOOL     is_zero, may_overflow;
-    SIZE   byte_idx, byte_count, bits, ii_length;
+    ION_SIZE   byte_idx, byte_count, bits, ii_length;
     BYTE     byte;
 
     IONCHECK(_ion_int_validate_arg_with_ptr(iint, buf));
@@ -595,7 +595,7 @@ iERR ion_int_from_abs_bytes(ION_INT *iint, BYTE *buf, SIZE limit, BOOL is_negati
 
     // make sure we have enough space in the iint
     bits = byte_count * 8;
-    ii_length = (SIZE)(((bits - 1) / II_BITS_PER_II_DIGIT)+1);
+    ii_length = (ION_SIZE)(((bits - 1) / II_BITS_PER_II_DIGIT)+1);
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
     
     is_zero = _ion_int_from_bytes_helper(iint, buf, byte_idx, limit, FALSE, FALSE);
@@ -614,7 +614,7 @@ iERR ion_int_from_abs_bytes(ION_INT *iint, BYTE *buf, SIZE limit, BOOL is_negati
 iERR ion_int_from_long(ION_INT *iint, int64_t value)
 {
     iENTER;
-    SIZE  ii_length, digit_idx;
+    ION_SIZE  ii_length, digit_idx;
     int64_t temp;
     BOOL    is_neg;
 
@@ -653,7 +653,7 @@ iERR ion_int_from_decimal(ION_INT *iint, const decQuad *p_value, decContext *con
 {
     iENTER;
     BOOL     is_neg;
-    SIZE   digit_idx, decimal_digits, bits, ii_length;
+    ION_SIZE   digit_idx, decimal_digits, bits, ii_length;
     II_DIGIT digit;
     decQuad  temp1, temp2;
     int32_t  is_zero;
@@ -678,8 +678,8 @@ iERR ion_int_from_decimal(ION_INT *iint, const decQuad *p_value, decContext *con
     decQuadCopyAbs(&temp1, p_value);
 
     decimal_digits = decQuadDigits(&temp1);
-    bits = (SIZE)(II_BITS_PER_DEC_DIGIT * decimal_digits) + 1;
-    ii_length = (SIZE)((bits - 1) / II_BITS_PER_II_DIGIT) + 1;
+    bits = (ION_SIZE)(II_BITS_PER_DEC_DIGIT * decimal_digits) + 1;
+    ii_length = (ION_SIZE)((bits - 1) / II_BITS_PER_II_DIGIT) + 1;
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
 
     for (digit_idx = iint->_len-1; ; digit_idx--) 
@@ -704,7 +704,7 @@ iERR _ion_int_from_decimal_number(ION_INT *iint, const decNumber *p_value, decCo
 {
     iENTER;
     BOOL     is_neg;
-    SIZE     bits, ii_length, dec_units;
+    ION_SIZE     bits, ii_length, dec_units;
     II_DIGIT dec_unit_shift = 1;
     int i;
 
@@ -722,8 +722,8 @@ iERR _ion_int_from_decimal_number(ION_INT *iint, const decNumber *p_value, decCo
     }
 
     is_neg = decNumberIsNegative(p_value);
-    bits = (SIZE)(II_BITS_PER_DEC_DIGIT * p_value->digits) + 1;
-    ii_length = (SIZE)((bits - 1) / II_BITS_PER_II_DIGIT) + 1;
+    bits = (ION_SIZE)(II_BITS_PER_DEC_DIGIT * p_value->digits) + 1;
+    ii_length = (ION_SIZE)((bits - 1) / II_BITS_PER_II_DIGIT) + 1;
     IONCHECK(_ion_int_extend_digits(iint, ii_length, TRUE));
     dec_units = (p_value->digits / DECDPUN) + ((p_value->digits % DECDPUN) ? 1 : 0);
     for (i = 0; i < DECDPUN; i++) {
@@ -738,7 +738,7 @@ iERR _ion_int_from_decimal_number(ION_INT *iint, const decNumber *p_value, decCo
 }
 
 
-iERR ion_int_char_length(ION_INT *iint, SIZE *p_len)
+iERR ion_int_char_length(ION_INT *iint, ION_SIZE *p_len)
 {
     iENTER;
 
@@ -750,10 +750,10 @@ iERR ion_int_char_length(ION_INT *iint, SIZE *p_len)
 }
 
 
-iERR ion_int_to_char(ION_INT *iint, BYTE *p_str, SIZE len, SIZE *p_written)
+iERR ion_int_to_char(ION_INT *iint, BYTE *p_str, ION_SIZE len, ION_SIZE *p_written)
 {
     iENTER;
-    SIZE decimal_digits;
+    ION_SIZE decimal_digits;
 
     IONCHECK(_ion_int_validate_non_null_arg_with_ptr(iint, p_str));
 
@@ -775,7 +775,7 @@ iERR ion_int_to_char(ION_INT *iint, BYTE *p_str, SIZE len, SIZE *p_written)
 iERR ion_int_to_string(ION_INT *iint, hOWNER owner, iSTRING p_str)
 {
     iENTER;
-    SIZE decimal_digits;
+    ION_SIZE decimal_digits;
 
     IONCHECK(_ion_int_validate_non_null_arg_with_ptr(iint, p_str));
 
@@ -786,7 +786,7 @@ iERR ion_int_to_string(ION_INT *iint, hOWNER owner, iSTRING p_str)
     p_str->length = decimal_digits;
     if (NULL == p_str->value) FAILWITH(IERR_NO_MEMORY);
     
-    IONCHECK(_ion_int_to_string_helper(iint, (char *)p_str->value, decimal_digits, (SIZE *)&(p_str->length)));
+    IONCHECK(_ion_int_to_string_helper(iint, (char *)p_str->value, decimal_digits, (ION_SIZE *)&(p_str->length)));
     if (p_str->length < decimal_digits) {
         p_str->value[p_str->length] = '\0';
     }
@@ -795,10 +795,10 @@ iERR ion_int_to_string(ION_INT *iint, hOWNER owner, iSTRING p_str)
 }
 
 
-iERR ion_int_byte_length(ION_INT *iint, SIZE *p_byte_length)
+iERR ion_int_byte_length(ION_INT *iint, ION_SIZE *p_byte_length)
 {
     iENTER;
-    SIZE len;
+    ION_SIZE len;
 
     IONCHECK(_ion_int_validate_non_null_arg_with_ptr(iint, p_byte_length));
 
@@ -811,16 +811,16 @@ iERR ion_int_byte_length(ION_INT *iint, SIZE *p_byte_length)
 }
 
 
-iERR ion_int_to_bytes(ION_INT *iint, SIZE starting_int_byte_offset 
-                     ,BYTE *buffer, SIZE buffer_length 
-                     ,SIZE *bytes_written
+iERR ion_int_to_bytes(ION_INT *iint, ION_SIZE starting_int_byte_offset 
+                     ,BYTE *buffer, ION_SIZE buffer_length 
+                     ,ION_SIZE *bytes_written
 ) {
     iENTER;
     BOOL     is_neg, sign_byte_needed = FALSE;
     ION_INT  neg, *tocopy;
-    SIZE   bytes;
-    SIZE   highbit, len;
-    SIZE   written = 0;
+    ION_SIZE   bytes;
+    ION_SIZE   highbit, len;
+    ION_SIZE   written = 0;
     int      value8;
     
     IONCHECK(_ion_int_validate_non_null_arg_with_ptr(iint, buffer));
@@ -887,7 +887,7 @@ iERR ion_int_to_bytes(ION_INT *iint, SIZE starting_int_byte_offset
 }
 
 
-iERR ion_int_abs_bytes_length(ION_INT *iint, SIZE *p_byte_length)
+iERR ion_int_abs_bytes_length(ION_INT *iint, ION_SIZE *p_byte_length)
 {
     iENTER;
 
@@ -900,12 +900,12 @@ iERR ion_int_abs_bytes_length(ION_INT *iint, SIZE *p_byte_length)
 }
 
 
-iERR ion_int_to_abs_bytes(ION_INT *iint, SIZE starting_int_byte_offset
-                        , BYTE *buffer, SIZE buffer_length
-                        , SIZE *bytes_written
+iERR ion_int_to_abs_bytes(ION_INT *iint, ION_SIZE starting_int_byte_offset
+                        , BYTE *buffer, ION_SIZE buffer_length
+                        , ION_SIZE *bytes_written
 ) {
     iENTER;
-    SIZE bytes, written;
+    ION_SIZE bytes, written;
     
     IONCHECK(_ion_int_validate_non_null_arg_with_ptr(iint, buffer));
     if (starting_int_byte_offset < 0) {
@@ -1123,7 +1123,7 @@ iERR _ion_int_zero(ION_INT *iint)
 }
 
 
-void * _ion_int_realloc_helper(void *value, SIZE old_len, void *owner, SIZE new_len)
+void * _ion_int_realloc_helper(void *value, ION_SIZE old_len, void *owner, ION_SIZE new_len)
 {
     if (old_len < new_len) {
         if (!owner) {
@@ -1138,10 +1138,10 @@ void * _ion_int_realloc_helper(void *value, SIZE old_len, void *owner, SIZE new_
 }
 
 
-iERR _ion_int_extend_digits(ION_INT *iint, SIZE digits_needed, BOOL zero_fill)
+iERR _ion_int_extend_digits(ION_INT *iint, ION_SIZE digits_needed, BOOL zero_fill)
 {
     iENTER;
-    SIZE  len;
+    ION_SIZE  len;
     void   *temp;
 
     ASSERT(iint);
@@ -1168,7 +1168,7 @@ iERR _ion_int_extend_digits(ION_INT *iint, SIZE digits_needed, BOOL zero_fill)
 }
 
 
-II_DIGIT *_ion_int_buffer_temp_copy( II_DIGIT *orig_digits, SIZE len, II_DIGIT *cache_buffer, SIZE cache_len)
+II_DIGIT *_ion_int_buffer_temp_copy( II_DIGIT *orig_digits, ION_SIZE len, II_DIGIT *cache_buffer, ION_SIZE cache_len)
 {
     ASSERT(orig_digits);
 
@@ -1206,9 +1206,9 @@ BOOL _ion_int_is_zero(const ION_INT *iint)
 }
 
 
-BOOL _ion_int_is_zero_bytes(const II_DIGIT *digits, SIZE len)
+BOOL _ion_int_is_zero_bytes(const II_DIGIT *digits, ION_SIZE len)
 {
-    SIZE ii;
+    ION_SIZE ii;
     ASSERT(digits);
     for (ii=0; ii<len; ii++) {
         if (digits[ii] != 0) return FALSE;
@@ -1217,11 +1217,11 @@ BOOL _ion_int_is_zero_bytes(const II_DIGIT *digits, SIZE len)
 }
 
 
-SIZE _ion_int_highest_bit_set_helper(const ION_INT *iint)
+ION_SIZE _ion_int_highest_bit_set_helper(const ION_INT *iint)
 {
     iENTER;
     II_DIGIT *digits, msd;
-    SIZE    ii, len, bits = 0;
+    ION_SIZE    ii, len, bits = 0;
 
     len = iint->_len;
     if (len < 1) return 0;
@@ -1250,7 +1250,7 @@ SIZE _ion_int_highest_bit_set_helper(const ION_INT *iint)
 }
 
 
-BOOL _ion_int_from_bytes_helper(ION_INT *iint, BYTE *buf, SIZE byte_idx, SIZE limit, BOOL invert, BOOL includes_sign_byte)
+BOOL _ion_int_from_bytes_helper(ION_INT *iint, BYTE *buf, ION_SIZE byte_idx, ION_SIZE limit, BOOL invert, BOOL includes_sign_byte)
 {
     BOOL     is_zero;
     int      digit_idx;
@@ -1354,9 +1354,9 @@ BOOL _ion_int_from_bytes_helper(ION_INT *iint, BYTE *buf, SIZE byte_idx, SIZE li
 }
 
 
-SIZE _ion_int_get_char_len_helper(const ION_INT *iint)
+ION_SIZE _ion_int_get_char_len_helper(const ION_INT *iint)
 {
-    SIZE bits, decimal_digits;
+    ION_SIZE bits, decimal_digits;
     
     ASSERT(iint);
     // calculate how many characters we'll need from the number of bits needed
@@ -1371,12 +1371,12 @@ SIZE _ion_int_get_char_len_helper(const ION_INT *iint)
 }
 
 
-iERR _ion_int_to_string_helper(ION_INT *iint, char *strbuf, SIZE buflen, SIZE *p_written) 
+iERR _ion_int_to_string_helper(ION_INT *iint, char *strbuf, ION_SIZE buflen, ION_SIZE *p_written) 
 {
     iENTER;
     II_DIGIT  small_copy[II_SMALL_DIGIT_ARRAY_LENGTH];
     II_DIGIT *digits = NULL, remainder;
-    SIZE      decimal_digits, len;
+    ION_SIZE      decimal_digits, len;
     char      c, *cp, *end, *head, *tail;
 
     ASSERT(iint && !_ion_int_is_null_helper(iint));
@@ -1413,7 +1413,7 @@ iERR _ion_int_to_string_helper(ION_INT *iint, char *strbuf, SIZE buflen, SIZE *p
     
     // now we know the real length (the estimate from the
     // allocation can be off by 1
-    decimal_digits = (SIZE)(cp - strbuf); // limited by buflen
+    decimal_digits = (ION_SIZE)(cp - strbuf); // limited by buflen
     
     // now we reverse the characters (bytes) in the string
     // to go from high to low
@@ -1435,9 +1435,9 @@ fail:
 }
 
 
-BOOL _ion_int_is_high_bytes_high_bit_set_helper(const ION_INT *iint, SIZE abs_byte_count)
+BOOL _ion_int_is_high_bytes_high_bit_set_helper(const ION_INT *iint, ION_SIZE abs_byte_count)
 {
-    SIZE   highbit, digitidx, bitidx;
+    ION_SIZE   highbit, digitidx, bitidx;
     II_DIGIT digit;
     int      highbitvalue;
 
@@ -1453,7 +1453,7 @@ BOOL _ion_int_is_high_bytes_high_bit_set_helper(const ION_INT *iint, SIZE abs_by
     // actually look at it, in some cases the highbit(s)
     // will be off the end of our digit bits (off the left,
     // or most sigificant bit, side) and therefore 0.
-    if (highbit < (iint->_len * (SIZE)II_BITS_PER_II_DIGIT)) {
+    if (highbit < (iint->_len * (ION_SIZE)II_BITS_PER_II_DIGIT)) {
         digitidx = iint->_len - (((highbit - 1) / II_BITS_PER_II_DIGIT) + 1); // here digitidx 1 is low order digit
         digit = iint->_digits[digitidx]; // array element 0 is high order digit, so invert
         bitidx = (highbit % II_BITS_PER_II_DIGIT);
@@ -1470,9 +1470,9 @@ BOOL _ion_int_is_high_bytes_high_bit_set_helper(const ION_INT *iint, SIZE abs_by
 }
 
 
-SIZE _ion_int_bytes_length_helper(const ION_INT *iint)
+ION_SIZE _ion_int_bytes_length_helper(const ION_INT *iint)
 {
-    SIZE bits, bytes;
+    ION_SIZE bits, bytes;
 
     ASSERT(iint);
     ASSERT(!_ion_int_is_null_helper(iint));
@@ -1497,17 +1497,17 @@ SIZE _ion_int_bytes_length_helper(const ION_INT *iint)
 
 
 iERR _ion_int_to_bytes_helper(ION_INT *iint
-                            , SIZE bytes_in_int
-                            , SIZE starting_int_byte_offset
+                            , ION_SIZE bytes_in_int
+                            , ION_SIZE starting_int_byte_offset
                             , BOOL is_neg
                             , BYTE *buffer
-                            , SIZE buffer_length
-                            , SIZE *bytes_written
+                            , ION_SIZE buffer_length
+                            , ION_SIZE *bytes_written
 )
 {
     iENTER;
-    SIZE tocopy, available32, needed8, available_bits;
-    SIZE written = 0;
+    ION_SIZE tocopy, available32, needed8, available_bits;
+    ION_SIZE written = 0;
     int    idx32, count32, value32, value8;
 
     // see how many bits there are to copy
@@ -1565,9 +1565,9 @@ iERR _ion_int_to_bytes_helper(ION_INT *iint
     iRETURN;
 }
 
-SIZE _ion_int_abs_bytes_length_helper_helper(const ION_INT *iint, BOOL is_signed)
+ION_SIZE _ion_int_abs_bytes_length_helper_helper(const ION_INT *iint, BOOL is_signed)
 {
-    SIZE bits, bytes = 0;
+    ION_SIZE bits, bytes = 0;
 
     ASSERT(iint);
     ASSERT(!_ion_int_is_null_helper(iint));
@@ -1589,12 +1589,12 @@ SIZE _ion_int_abs_bytes_length_helper_helper(const ION_INT *iint, BOOL is_signed
     return bytes;
 }
 
-SIZE _ion_int_abs_bytes_length_helper(const ION_INT *iint)
+ION_SIZE _ion_int_abs_bytes_length_helper(const ION_INT *iint)
 {
     return _ion_int_abs_bytes_length_helper_helper(iint, /*is_signed=*/FALSE);
 }
 
-SIZE _ion_int_abs_bytes_signed_length_helper(const ION_INT *iint)
+ION_SIZE _ion_int_abs_bytes_signed_length_helper(const ION_INT *iint)
 {
     return _ion_int_abs_bytes_length_helper_helper(iint, /*is_signed=*/TRUE);
 }
@@ -1628,7 +1628,7 @@ iERR _ion_int_to_int64_helper(ION_INT *iint, int64_t *p_int64)
 
 
 iERR _ion_int_add_digit(II_DIGIT *digits
-                      , SIZE   digit_count
+                      , ION_SIZE   digit_count
                       , II_DIGIT value
 ) {
     iENTER;
@@ -1655,7 +1655,7 @@ iERR _ion_int_add_digit(II_DIGIT *digits
 
 
 iERR _ion_int_sub_digit(II_DIGIT *digits
-                      , SIZE   digit_count
+                      , ION_SIZE   digit_count
                       , II_DIGIT value
 ) {
     iENTER;
@@ -1690,7 +1690,7 @@ iERR _ion_int_sub_digit(II_DIGIT *digits
 
 /* - not used ??
 iERR _ion_int_multiply_by_digit(II_DIGIT *digits
-                              , SIZE    digit_count
+                              , ION_SIZE    digit_count
                               , II_DIGIT  value
 ) {
     iENTER;
@@ -1716,7 +1716,7 @@ iERR _ion_int_multiply_by_digit(II_DIGIT *digits
 */
 
 iERR _ion_int_multiply_and_add(II_DIGIT *digits
-                              , SIZE   digit_count
+                              , ION_SIZE   digit_count
                               , II_DIGIT mult_value
                               , II_DIGIT add_value
 ) {
@@ -1744,14 +1744,14 @@ iERR _ion_int_multiply_and_add(II_DIGIT *digits
 
 
 iERR _ion_int_divide_by_digit(II_DIGIT *digits
-                            , SIZE      digit_count
+                            , ION_SIZE      digit_count
                             , II_DIGIT  value
                             , II_DIGIT *p_remainder
 ) {
     iENTER;
     II_DIGIT      digit;
     II_LONG_DIGIT temp, new_digit, remainder = 0, lvalue = value;
-    SIZE        ii;
+    ION_SIZE        ii;
 
     ASSERT( digits );
     ASSERT( (value < II_BASE) && (value > 0) );

@@ -27,12 +27,12 @@ extern "C" {
 typedef struct _ion_symbol_import_location
 {
     ION_STRING name;
-    SID        location;
+    ION_SID        location;
 } ION_SYMBOL_IMPORT_LOCATION;
 
 struct _ion_symbol
 {
-    SID                         sid;
+    ION_SID                         sid;
     ION_STRING                  value;
     ION_SYMBOL_IMPORT_LOCATION  import_location;
     // TODO this is only needed for symbol usage metrics. Consider removal.
@@ -292,11 +292,11 @@ ION_API_EXPORT iERR ion_symbol_table_get_type           (hSYMTAB hsymtab, ION_SY
 
 ION_API_EXPORT iERR ion_symbol_table_get_name           (hSYMTAB hsymtab, iSTRING p_name);
 ION_API_EXPORT iERR ion_symbol_table_get_version        (hSYMTAB hsymtab, int32_t *p_version);
-ION_API_EXPORT iERR ion_symbol_table_get_max_sid        (hSYMTAB hsymtab, SID *p_max_id);
+ION_API_EXPORT iERR ion_symbol_table_get_max_sid        (hSYMTAB hsymtab, ION_SID *p_max_id);
 
 ION_API_EXPORT iERR ion_symbol_table_set_name           (hSYMTAB hsymtab, iSTRING name);
 ION_API_EXPORT iERR ion_symbol_table_set_version        (hSYMTAB hsymtab, int32_t version);
-ION_API_EXPORT iERR ion_symbol_table_set_max_sid        (hSYMTAB hsymtab, SID max_id);
+ION_API_EXPORT iERR ion_symbol_table_set_max_sid        (hSYMTAB hsymtab, ION_SID max_id);
 
 ION_API_EXPORT iERR ion_symbol_table_get_imports        (hSYMTAB hsymtab, ION_COLLECTION **p_imports);
 
@@ -318,14 +318,14 @@ ION_API_EXPORT iERR ion_symbol_table_add_import         (hSYMTAB hsymtab, ION_SY
  */
 ION_API_EXPORT iERR ion_symbol_table_import_symbol_table(hSYMTAB hsymtab, hSYMTAB hsymtab_import);
 
-ION_API_EXPORT iERR ion_symbol_table_find_by_name       (hSYMTAB hsymtab, iSTRING name, SID *p_sid);
-ION_API_EXPORT iERR ion_symbol_table_find_by_sid        (hSYMTAB hsymtab, SID sid, iSTRING *p_name);
-ION_API_EXPORT iERR ion_symbol_table_is_symbol_known    (hSYMTAB hsymtab, SID sid, BOOL *p_is_known);
+ION_API_EXPORT iERR ion_symbol_table_find_by_name       (hSYMTAB hsymtab, iSTRING name, ION_SID *p_sid);
+ION_API_EXPORT iERR ion_symbol_table_find_by_sid        (hSYMTAB hsymtab, ION_SID sid, iSTRING *p_name);
+ION_API_EXPORT iERR ion_symbol_table_is_symbol_known    (hSYMTAB hsymtab, ION_SID sid, BOOL *p_is_known);
 
-ION_API_EXPORT iERR ion_symbol_table_get_symbol         (hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_sym); // get symbols by sid, iterate from 1 to max_sid - returns all symbols
-ION_API_EXPORT iERR ion_symbol_table_get_local_symbol   (hSYMTAB hsymtab, SID sid, ION_SYMBOL **p_sym); // get symbols by sid, iterate from 1 to max_sid - returns only locally defined symbols
+ION_API_EXPORT iERR ion_symbol_table_get_symbol         (hSYMTAB hsymtab, ION_SID sid, ION_SYMBOL **p_sym); // get symbols by sid, iterate from 1 to max_sid - returns all symbols
+ION_API_EXPORT iERR ion_symbol_table_get_local_symbol   (hSYMTAB hsymtab, ION_SID sid, ION_SYMBOL **p_sym); // get symbols by sid, iterate from 1 to max_sid - returns only locally defined symbols
 
-ION_API_EXPORT iERR ion_symbol_table_add_symbol         (hSYMTAB hsymtab, iSTRING name, SID *p_sid);
+ION_API_EXPORT iERR ion_symbol_table_add_symbol         (hSYMTAB hsymtab, iSTRING name, ION_SID *p_sid);
 
 /**
  * If the given symbol table is its own memory owner, its memory and everything it owns is freed. If the given symbol

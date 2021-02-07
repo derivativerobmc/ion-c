@@ -345,7 +345,7 @@ ION_API_EXPORT iERR ion_extractor_path_append_wildcard(hPATH path);
  * Ownership: the caller owns the callback and the user context.
  */
 ION_API_EXPORT iERR ion_extractor_path_create_from_ion(hEXTRACTOR extractor, ION_EXTRACTOR_CALLBACK callback,
-                                                       void *user_context, BYTE *ion_data, SIZE ion_data_length,
+                                                       void *user_context, BYTE *ion_data, ION_SIZE ion_data_length,
                                                        hPATH *p_path);
 
 /**

@@ -22,7 +22,7 @@
 #include "ion_internal.h"
 #include <string.h>
 
-BOOL ion_helper_is_ion_version_marker(BYTE *buffer, SIZE len) 
+BOOL ion_helper_is_ion_version_marker(BYTE *buffer, ION_SIZE len) 
 {
     BOOL is_ion_version_marker = 
             len       >= ION_VERSION_MARKER_LENGTH

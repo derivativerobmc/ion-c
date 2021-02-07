@@ -54,7 +54,7 @@ iRETURN;
 
 /* Memory management */
 
-iERR _ion_decimal_number_alloc(void *owner, SIZE decimal_digits, decNumber **p_number) {
+iERR _ion_decimal_number_alloc(void *owner, ION_SIZE decimal_digits, decNumber **p_number) {
     iENTER;
     ASSERT(p_number);
     if (!owner) {
@@ -118,7 +118,7 @@ iERR _ion_decimal_from_string_helper(const char *str, decContext *context, hOWNE
     iENTER;
     const char *cp;
     uint32_t   saved_status;
-    SIZE       decimal_digits = 0;
+    ION_SIZE       decimal_digits = 0;
 
     // NOTE: decFloatFromString and decNumberFromString have been modified to accept both 'e' and 'd'. If the decNumber
     // implementation is updated or swapped out, arrangements need to be made here (or there) to ensure this function

@@ -180,8 +180,8 @@ typedef int64_t                   POSITION;
 
 
 ION_API_EXPORT iERR ion_stream_open_buffer(BYTE *buffer       // pointer to memory to stream over
-                           , SIZE buf_length    // length of user buffer, filled or not
-                           , SIZE buf_filled    // length of user filled data (0 or more bytes)
+                           , ION_SIZE buf_length    // length of user buffer, filled or not
+                           , ION_SIZE buf_filled    // length of user filled data (0 or more bytes)
                            , BOOL read_only     // if read_only is true write is disallowed (read is always valid)
                            , ION_STREAM **pp_stream
 );
@@ -229,15 +229,15 @@ ION_API_EXPORT POSITION  ion_stream_get_marked_length (ION_STREAM *stream);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ION_API_EXPORT iERR ion_stream_read_byte           (ION_STREAM *stream, int *p_c);
-ION_API_EXPORT iERR ion_stream_read                (ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_read);
+ION_API_EXPORT iERR ion_stream_read                (ION_STREAM *stream, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_read);
 ION_API_EXPORT iERR ion_stream_unread_byte         (ION_STREAM *stream, int c);
-ION_API_EXPORT iERR ion_stream_write               (ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_written);
+ION_API_EXPORT iERR ion_stream_write               (ION_STREAM *stream, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written);
 ION_API_EXPORT iERR ion_stream_write_byte          (ION_STREAM *stream, int byte);
 ION_API_EXPORT iERR ion_stream_write_byte_no_checks(ION_STREAM *stream, int byte);
-ION_API_EXPORT iERR ion_stream_write_stream        (ION_STREAM *stream, ION_STREAM *stream_input, SIZE len, SIZE *p_written);
+ION_API_EXPORT iERR ion_stream_write_stream        (ION_STREAM *stream, ION_STREAM *stream_input, ION_SIZE len, ION_SIZE *p_written);
 ION_API_EXPORT iERR ion_stream_seek                (ION_STREAM *stream, POSITION position);
 ION_API_EXPORT iERR ion_stream_truncate            (ION_STREAM *stream);
-ION_API_EXPORT iERR ion_stream_skip                (ION_STREAM *stream, SIZE distance, SIZE *p_skipped);
+ION_API_EXPORT iERR ion_stream_skip                (ION_STREAM *stream, ION_SIZE distance, ION_SIZE *p_skipped);
 ION_API_EXPORT iERR ion_stream_mark                (ION_STREAM *stream);
 ION_API_EXPORT iERR ion_stream_mark_remark         (ION_STREAM *stream, POSITION position);
 ION_API_EXPORT iERR ion_stream_mark_rewind         (ION_STREAM *stream);

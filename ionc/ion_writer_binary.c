@@ -214,7 +214,7 @@ iERR _ion_writer_binary_start_value(ION_WRITER *pwriter, int value_length)
     int                 start, finish, patch_len;
     int                 sid_count, ii, annotations_len = 0;
     int                 annotation_len_o_len, total_ann_value_len;
-    SID                 sid;
+    ION_SID                 sid;
 
     // because we support start_lob, append_lob, finish_lob we have
     // to make sure someone doesn't start something if they haven't
@@ -342,11 +342,11 @@ iERR _ion_writer_binary_start_lob(ION_WRITER *pwriter, ION_TYPE lob_type)
     iRETURN;
 }
 
-iERR _ion_writer_binary_append_lob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_binary_append_lob(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     ION_TYPE lob_type;
-    SIZE     written;
+    ION_SIZE     written;
 
     if (!pwriter)   FAILWITH(IERR_BAD_HANDLE);
     if (!p_buf)     FAILWITH(IERR_INVALID_ARG);
@@ -502,7 +502,7 @@ iERR _ion_writer_binary_write_ion_int(ION_WRITER *pwriter, ION_INT *iint)
 {
     iENTER;
     int  offset, ln, patch_len, len = 0, td = 0;
-    SIZE bytes_written, written;
+    ION_SIZE bytes_written, written;
     BYTE buffer[LOCAL_STACK_BUFFER_SIZE];
 
     if (iint->_signum < 0) {
@@ -567,12 +567,12 @@ iERR _ion_writer_binary_write_double(ION_WRITER *pwriter, double value)
     iRETURN;
 }
 
-iERR _ion_writer_binary_write_decimal_helper(ION_STREAM *pstream, ION_INT *mantissa, SIZE mantissa_len,
+iERR _ion_writer_binary_write_decimal_helper(ION_STREAM *pstream, ION_INT *mantissa, ION_SIZE mantissa_len,
                                              int32_t exponent) {
     iENTER;
     BYTE int_bytes[LOCAL_STACK_BUFFER_SIZE];
     BYTE *chunk_start = NULL;
-    SIZE offset, chunk_len, bytes_written, stream_written;
+    ION_SIZE offset, chunk_len, bytes_written, stream_written;
 
     ASSERT(pstream != NULL);
 
@@ -642,7 +642,7 @@ iERR _ion_writer_binary_write_decimal_small_helper(ION_STREAM *pstream, uint64_t
 
 iERR _ion_writer_binary_decimal_quad_len_and_mantissa(ION_WRITER *pwriter, decQuad *value, decQuad *mantissa,
                                                       decContext *context, int32_t exponent, ION_INT *p_int_mantissa,
-                                                      SIZE *p_mantissa_len, SIZE *p_len) {
+                                                      ION_SIZE *p_mantissa_len, ION_SIZE *p_len) {
     iENTER;
 
     ASSERT(!decQuadIsZero(value));
@@ -657,7 +657,7 @@ iERR _ion_writer_binary_decimal_quad_len_and_mantissa(ION_WRITER *pwriter, decQu
 }
 
 iERR _ion_writer_binary_decimal_number_len_and_mantissa(ION_WRITER *pwriter, decNumber *value, decContext *context,
-                                                        ION_INT *p_int_mantissa, SIZE *p_mantissa_len, SIZE *p_len) {
+                                                        ION_INT *p_int_mantissa, ION_SIZE *p_mantissa_len, ION_SIZE *p_len) {
     iENTER;
     ASSERT(!decNumberIsZero(value));
 
@@ -669,7 +669,7 @@ iERR _ion_writer_binary_decimal_number_len_and_mantissa(ION_WRITER *pwriter, dec
     iRETURN;
 }
 
-iERR _ion_writer_binary_decimal_small_len(uint64_t mantissa, int32_t exponent, BOOL is_negative, SIZE *p_len) {
+iERR _ion_writer_binary_decimal_small_len(uint64_t mantissa, int32_t exponent, BOOL is_negative, ION_SIZE *p_len) {
     iENTER;
     // Could be 0e10, -0d0 or true 0 "0d0"
     if (mantissa == 0) {
@@ -723,7 +723,7 @@ iERR _ion_writer_binary_write_decimal_quad_helper(ION_WRITER *pwriter, decQuad *
 {
     iENTER;
     ION_INT int_mantissa;
-    SIZE int_mantissa_len;
+    ION_SIZE int_mantissa_len;
     int len = 0, patch_len;
 
     IONCHECK(_ion_writer_binary_decimal_quad_len_and_mantissa(pwriter, value, dec_mantissa, &pwriter->deccontext,
@@ -756,7 +756,7 @@ iERR _ion_writer_binary_write_decimal_number_helper(ION_WRITER *pwriter, decNumb
 {
     iENTER;
     ION_INT int_mantissa;
-    SIZE int_mantissa_len;
+    ION_SIZE int_mantissa_len;
     int len = 0, patch_len;
     IONCHECK(_ion_writer_binary_decimal_number_len_and_mantissa(pwriter, value, &pwriter->deccontext, &int_mantissa,
                                                                 &int_mantissa_len, &len));
@@ -933,7 +933,7 @@ iERR _ion_writer_binary_write_timestamp_fraction_quad(ION_WRITER *pwriter, ION_T
 {
     iENTER;
     ION_INT int_mantissa;
-    SIZE int_mantissa_len;
+    ION_SIZE int_mantissa_len;
     int len, patch_len;
 
     len = _ion_writer_binary_timestamp_len_without_fraction(value);
@@ -1038,7 +1038,7 @@ iERR _ion_writer_binary_write_string(ION_WRITER *pwriter, ION_STRING *pstr )
     iENTER;
     int  len, ln;
     int  patch_len;
-    SIZE written;
+    ION_SIZE written;
 
     if (!pstr || !pstr->value) {
         IONCHECK(_ion_writer_binary_write_typed_null(pwriter, tid_STRING));
@@ -1068,7 +1068,7 @@ iERR _ion_writer_binary_write_string(ION_WRITER *pwriter, ION_STRING *pstr )
     iRETURN;
 }
 
-iERR _ion_writer_binary_write_symbol_id(ION_WRITER *pwriter, SID sid)
+iERR _ion_writer_binary_write_symbol_id(ION_WRITER *pwriter, ION_SID sid)
 {
     iENTER;
     if (pwriter->depth == 0 && pwriter->annotation_count == 0 && _ion_symbol_table_sid_is_IVM(sid)) {
@@ -1095,7 +1095,7 @@ iERR _ion_writer_binary_write_symbol_id(ION_WRITER *pwriter, SID sid)
 iERR _ion_writer_binary_write_symbol(ION_WRITER *pwriter, ION_STRING *pstr )
 {
     iENTER;
-    SID sid = UNKNOWN_SID;
+    ION_SID sid = UNKNOWN_SID;
 
     if (!pstr || !pstr->value) {
         IONCHECK(_ion_writer_binary_write_typed_null(pwriter, tid_SYMBOL));
@@ -1111,12 +1111,12 @@ iERR _ion_writer_binary_write_symbol(ION_WRITER *pwriter, ION_STRING *pstr )
 }
 
 
-iERR _ion_writer_binary_write_clob(ION_WRITER *pwriter, BYTE *pbuf, SIZE len)
+iERR _ion_writer_binary_write_clob(ION_WRITER *pwriter, BYTE *pbuf, ION_SIZE len)
 {
     iENTER;
     int  patch_len = ION_BINARY_TYPE_DESC_LENGTH;
     int  ln = len;
-    SIZE written;
+    ION_SIZE written;
 
     if (pbuf == NULL) {
         IONCHECK(_ion_writer_binary_write_typed_null(pwriter, tid_CLOB));
@@ -1141,12 +1141,12 @@ iERR _ion_writer_binary_write_clob(ION_WRITER *pwriter, BYTE *pbuf, SIZE len)
     iRETURN;
 }
 
-iERR _ion_writer_binary_write_blob(ION_WRITER *pwriter, BYTE *pbuf, SIZE len)
+iERR _ion_writer_binary_write_blob(ION_WRITER *pwriter, BYTE *pbuf, ION_SIZE len)
 {
     iENTER;
     int  patch_len = ION_BINARY_TYPE_DESC_LENGTH;
     int  ln = len;
-    SIZE written;
+    ION_SIZE written;
 
     if (pbuf == NULL) {
         IONCHECK(_ion_writer_binary_write_typed_null(pwriter, tid_BLOB));
@@ -1223,7 +1223,7 @@ iERR _ion_writer_binary_flush_to_output(ION_WRITER *pwriter)
     int                pos, buffer_length;
     int                patch_pos;
     int                len;
-    SIZE               written;
+    ION_SIZE               written;
 
     ION_BINARY_PATCH  *ppatch;
     ION_STREAM        *out = pwriter->output;
@@ -1367,8 +1367,8 @@ iERR _ion_writer_binary_serialize_symbol_table(ION_SYMBOL_TABLE *psymtab, ION_ST
             SUCCEED();
         }
         // Abbreviated syntax for appending to the already-written symbol table.
-        import_list_len = 1; // SID 3 ($ion_symbol_table) as UInt
-        import_header_len = 1 + ION_BINARY_TYPE_DESC_LENGTH; // SID 6 (imports) as VarUint + typedesc for symbol value
+        import_list_len = 1; // ION_SID 3 ($ion_symbol_table) as UInt
+        import_header_len = 1 + ION_BINARY_TYPE_DESC_LENGTH; // ION_SID 6 (imports) as VarUint + typedesc for symbol value
     }
     else {
         // This symbol table has not been written previously. Its imports must be explicitly written.

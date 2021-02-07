@@ -77,7 +77,7 @@ struct _ion_collection
 #define ION_COLLECTION_IS_EMPTY(collection)         \
     ((collection)->_head == NULL)
 
-// SIZE count = ion_collection_size(ION_COLLECTION_CURSOR *pcursor)
+// ION_SIZE count = ion_collection_size(ION_COLLECTION_CURSOR *pcursor)
 #define ION_COLLECTION_SIZE(pcol)                   \
     ((pcol)->_count)
 

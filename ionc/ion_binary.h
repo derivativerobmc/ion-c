@@ -47,10 +47,10 @@ extern "C" {
 
 #define ION_BINARY_UNKNOWN_LENGTH               (-1)
 
-#define VAR_UINT_64_IMAGE_LENGTH                ((SIZE)(((sizeof(uint64_t)*8) / 7) + 1))
-#define UINT_64_IMAGE_LENGTH                    ((SIZE)(sizeof(uint64_t)))
-#define VAR_INT_64_IMAGE_LENGTH                 ((SIZE)(((sizeof(int64_t)*8) / 7) + 1)) /* same as var_uint */
-#define INT_64_IMAGE_LENGTH                     ((SIZE)(sizeof(int64_t) + 1)) /* needs 1 extra byte for sign bit overflow */
+#define VAR_UINT_64_IMAGE_LENGTH                ((ION_SIZE)(((sizeof(uint64_t)*8) / 7) + 1))
+#define UINT_64_IMAGE_LENGTH                    ((ION_SIZE)(sizeof(uint64_t)))
+#define VAR_INT_64_IMAGE_LENGTH                 ((ION_SIZE)(((sizeof(int64_t)*8) / 7) + 1)) /* same as var_uint */
+#define INT_64_IMAGE_LENGTH                     ((ION_SIZE)(sizeof(int64_t) + 1)) /* needs 1 extra byte for sign bit overflow */
 
 
 /** Calculate the length of binary encoded uint.
@@ -112,9 +112,9 @@ ION_API_EXPORT iERR ion_binary_read_string         (ION_STREAM *pstream, int32_t
 
 ION_API_EXPORT iERR ion_binary_write_float_value           ( ION_STREAM *pstream, double value );
 
-ION_API_EXPORT iERR ion_binary_write_int32_with_field_sid  ( ION_STREAM *pstream, SID field_sid, int32_t value );
-ION_API_EXPORT iERR ion_binary_write_int64_with_field_sid  ( ION_STREAM *pstream, SID sid, int64_t value );
-ION_API_EXPORT iERR ion_binary_write_string_with_field_sid ( ION_STREAM *pstream, SID field_sid, ION_STRING *str );
+ION_API_EXPORT iERR ion_binary_write_int32_with_field_sid  ( ION_STREAM *pstream, ION_SID field_sid, int32_t value );
+ION_API_EXPORT iERR ion_binary_write_int64_with_field_sid  ( ION_STREAM *pstream, ION_SID sid, int64_t value );
+ION_API_EXPORT iERR ion_binary_write_string_with_field_sid ( ION_STREAM *pstream, ION_SID field_sid, ION_STRING *str );
 ION_API_EXPORT iERR ion_binary_write_string_with_td_byte   ( ION_STREAM *pstream, ION_STRING *str );
 
 ION_API_EXPORT iERR ion_binary_write_type_desc_with_length ( ION_STREAM *pstream, int tid, int32_t len );

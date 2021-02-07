@@ -101,7 +101,7 @@ typedef struct _ion_scanner
      */
     ION_SUB_TYPE    _unread_sub_type;
     int             _unread_value_location; // when we unread we need to 
-    SIZE            _unread_value_length;
+    ION_SIZE            _unread_value_length;
 
     /** Used to keep track of the location (line number) of the current token. It's for debugging and error reporting.
      * @see _offset
@@ -439,30 +439,30 @@ iERR _ion_scanner_skip_list                         (ION_SCANNER *scanner);
 iERR _ion_scanner_skip_struct                       (ION_SCANNER *scanner);
 iERR _ion_scanner_skip_container                    (ION_SCANNER *scanner, int close_char);
 
-iERR _ion_scanner_read_cached_bytes                 (ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written);
+iERR _ion_scanner_read_cached_bytes                 (ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written);
 
-iERR _ion_scanner_read_as_string                    (ION_SCANNER *scanner, BYTE *buf, SIZE len, ION_SUB_TYPE ist, SIZE *p_bytes_written, BOOL *p_eos_encountered);
-iERR _ion_scanner_read_as_string_to_quote           (ION_SCANNER *scanner, BYTE *buf, SIZE len, ION_SUB_TYPE ist, SIZE *p_bytes_written, BOOL *p_eos_encountered);
-iERR _ion_scanner_read_as_symbol                    (ION_SCANNER *scanner, BYTE *dst, SIZE len, SIZE *p_bytes_written);
-iERR _ion_scanner_read_as_extended_symbol           (ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written);
-iERR _ion_scanner_encode_utf8_char                  (ION_SCANNER *scanner, int c, BYTE *buf, SIZE remaining, SIZE *p_bytes_written);
+iERR _ion_scanner_read_as_string                    (ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SUB_TYPE ist, ION_SIZE *p_bytes_written, BOOL *p_eos_encountered);
+iERR _ion_scanner_read_as_string_to_quote           (ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SUB_TYPE ist, ION_SIZE *p_bytes_written, BOOL *p_eos_encountered);
+iERR _ion_scanner_read_as_symbol                    (ION_SCANNER *scanner, BYTE *dst, ION_SIZE len, ION_SIZE *p_bytes_written);
+iERR _ion_scanner_read_as_extended_symbol           (ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written);
+iERR _ion_scanner_encode_utf8_char                  (ION_SCANNER *scanner, int c, BYTE *buf, ION_SIZE remaining, ION_SIZE *p_bytes_written);
 
 iERR _ion_scanner_read_escaped_char                 (ION_SCANNER *scanner, ION_SUB_TYPE ist, int *p_char);
 iERR _ion_scanner_read_hex_escape_value             (ION_SCANNER *scanner, int hex_len, int *p_hexchar);
 iERR _ion_scanner_peek_for_next_triple_quote        (ION_SCANNER *scanner, BOOL is_clob, BOOL *p_triple_quote_found);
 iERR _ion_scanner_read_lob_closing_braces           (ION_SCANNER *scanner);
 
-iERR _ion_scanner_read_as_base64                    (ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written, BOOL *p_eos_encountered);
+iERR _ion_scanner_read_as_base64                    (ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written, BOOL *p_eos_encountered);
 
 
 iERR _ion_scanner_read_possible_number              (ION_SCANNER *scanner, int c, int sign, ION_SUB_TYPE *p_ist);
-iERR _ion_scanner_read_radix_int                    (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char, ION_INT_RADIX radix, BOOL underscore_allowed);
-iERR _ion_scanner_read_hex_int                      (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining);
-iERR _ion_scanner_read_binary_int                   (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining);
-iERR _ion_scanner_read_digits                       (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char);
-iERR _ion_scanner_read_digits_with_underscores      (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char, BOOL underscore_allowed);
-iERR _ion_scanner_read_exponent                     (ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char);
-iERR _ion_scanner_read_timestamp                    (ION_SCANNER *scanner, int c, BYTE **p_dst, SIZE *p_remaining, ION_SUB_TYPE *p_ist );
+iERR _ion_scanner_read_radix_int                    (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char, ION_INT_RADIX radix, BOOL underscore_allowed);
+iERR _ion_scanner_read_hex_int                      (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining);
+iERR _ion_scanner_read_binary_int                   (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining);
+iERR _ion_scanner_read_digits                       (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char);
+iERR _ion_scanner_read_digits_with_underscores      (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char, BOOL underscore_allowed);
+iERR _ion_scanner_read_exponent                     (ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char);
+iERR _ion_scanner_read_timestamp                    (ION_SCANNER *scanner, int c, BYTE **p_dst, ION_SIZE *p_remaining, ION_SUB_TYPE *p_ist );
 
 #ifdef __cplusplus
 }

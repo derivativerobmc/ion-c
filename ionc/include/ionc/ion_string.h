@@ -56,7 +56,7 @@ struct _ion_string
 
 ION_API_EXPORT void        ion_string_init         (ION_STRING *str);
 ION_API_EXPORT void        ion_string_assign       (ION_STRING *dst, ION_STRING *src);  // assigns contents but doesn't move bytes
-ION_API_EXPORT ION_STRING *ion_string_assign_cstr  (ION_STRING *str, char *val, SIZE len);
+ION_API_EXPORT ION_STRING *ion_string_assign_cstr  (ION_STRING *str, char *val, ION_SIZE len);
 ION_API_EXPORT char       *ion_string_strdup       (ION_STRING *p_ionstring);
 ION_API_EXPORT iERR        ion_string_copy_to_owner(hOWNER owner, ION_STRING *dst, ION_STRING *src);
 

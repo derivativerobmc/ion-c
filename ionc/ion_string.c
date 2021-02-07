@@ -42,7 +42,7 @@ void  ion_string_assign(ION_STRING *dst, ION_STRING *src)
 }
 
 // assigns the contest of a c string to the ion_string
-ION_STRING *ion_string_assign_cstr(ION_STRING *str, char *val, SIZE len)
+ION_STRING *ion_string_assign_cstr(ION_STRING *str, char *val, ION_SIZE len)
 {
     ASSERT(str);
     if (len > MAX_INT32) return NULL;

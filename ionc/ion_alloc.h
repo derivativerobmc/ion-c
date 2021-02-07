@@ -46,7 +46,7 @@ extern "C" {
 //
 // support routines for memory managment
 //
-ION_API_EXPORT char       *ion_alloc_name      (hOWNER  owner, SIZE length);
+ION_API_EXPORT char       *ion_alloc_name      (hOWNER  owner, ION_SIZE length);
 ION_API_EXPORT iIMPORT    *ion_alloc_import    (hSYMTAB hsymtab);
 ION_API_EXPORT iSYMBOL    *ion_alloc_symbol    (hSYMTAB hsymtab);
 ION_API_EXPORT decQuad    *ion_alloc_decimal   (hOWNER  owner);
@@ -96,7 +96,7 @@ typedef struct _ion_allocation_chain ION_ALLOCATION_CHAIN;
 
 struct _ion_allocation_chain 
 {
-    SIZE                  size;
+    ION_SIZE                  size;
     ION_ALLOCATION_CHAIN *next;
     ION_ALLOCATION_CHAIN *head;
 
@@ -143,7 +143,7 @@ struct _ion_alloc_page
 
 struct _ion_alloc_page_list
 {
-    SIZE            page_size;
+    ION_SIZE            page_size;
     int             page_count;
     int             free_page_limit;
     ION_ALLOC_PAGE *head;
@@ -161,22 +161,22 @@ GLOBAL ION_ALLOC_PAGE_LIST g_ion_alloc_page_list
 #endif
 ;
 
-ION_API_EXPORT void             ion_initialize_page_pool    (SIZE page_size, int free_page_limit);
+ION_API_EXPORT void             ion_initialize_page_pool    (ION_SIZE page_size, int free_page_limit);
 ION_API_EXPORT void             ion_release_page_pool       (void);
 
 ION_ALLOC_PAGE *_ion_alloc_page              (void);
 void            _ion_release_page            (ION_ALLOC_PAGE *page);
 
-void *_ion_alloc_owner     (SIZE len);
-void *_ion_alloc_with_owner(hOWNER owner, SIZE length);
+void *_ion_alloc_owner     (ION_SIZE len);
+void *_ion_alloc_with_owner(hOWNER owner, ION_SIZE length);
 void  _ion_free_owner      (hOWNER owner);
 iERR  _ion_strdup          (hOWNER owner, iSTRING dst, iSTRING src);
 
 
 
 #ifdef MEM_DEBUG 
-void *_dbg_ion_alloc_owner     (SIZE len, const char *file, int line);
-void *_dbg_ion_alloc_with_owner(hOWNER owner, SIZE length, const char *file, int line);
+void *_dbg_ion_alloc_owner     (ION_SIZE len, const char *file, int line);
+void *_dbg_ion_alloc_with_owner(hOWNER owner, ION_SIZE length, const char *file, int line);
 void  _dbg_ion_free_owner      (hOWNER owner, const char *file, int line);
 iERR  _dbg_ion_strdup          (hOWNER owner, iSTRING dst, iSTRING src, const char *file, int line);
 #endif

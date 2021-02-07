@@ -168,8 +168,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 iERR ion_stream_open_buffer( BYTE *buffer       // pointer to memory to stream over
-                           , SIZE buf_length    // length of user buffer, filled or not
-                           , SIZE buf_filled    // length of user filled data (0 or more bytes)
+                           , ION_SIZE buf_length    // length of user buffer, filled or not
+                           , ION_SIZE buf_filled    // length of user filled data (0 or more bytes)
                            , BOOL read_only     // if read_only is true write is disallowed (read is always valid)
                            , ION_STREAM **pp_stream
 ) {
@@ -642,10 +642,10 @@ iERR ion_stream_read_byte(ION_STREAM *stream, int *p_c)
   iRETURN;
 }
 
-iERR ion_stream_read(ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_read)
+iERR ion_stream_read(ION_STREAM *stream, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_read)
 {
   iENTER;
-  SIZE     available, needed = len;
+  ION_SIZE     available, needed = len;
   POSITION position;
   BYTE    *dst = buf;
   
@@ -656,7 +656,7 @@ iERR ion_stream_read(ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_read
   if (_ion_stream_can_read(stream) == FALSE) FAILWITH(IERR_INVALID_ARG);
 
   while (needed > 0) {
-    available = (SIZE)(stream->_limit - stream->_curr);
+    available = (ION_SIZE)(stream->_limit - stream->_curr);
     if (available < 1) {
       // note that position is the next (unavailable) byte
       // since it is past the limit of this page
@@ -664,7 +664,7 @@ iERR ion_stream_read(ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_read
       err = _ion_stream_fetch_position(stream, position);
       if (err && err != IERR_EOF) FAILWITH(err); // on EOF we'll break out just below
       
-      available = (SIZE)(stream->_limit - stream->_curr);
+      available = (ION_SIZE)(stream->_limit - stream->_curr);
       if (available < 1) {
         break;
       }
@@ -752,10 +752,10 @@ iERR ion_stream_unread_byte(ION_STREAM *stream, int c)
 }
 
 // write len bytes from buf onto output, returns bytes actually written which should be len
-iERR ion_stream_write(ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_written)
+iERR ion_stream_write(ION_STREAM *stream, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written)
 {
   iENTER;
-  SIZE to_write, src_remaining = len;
+  ION_SIZE to_write, src_remaining = len;
   BYTE *dst, *src = buf;
   
   if (!stream) FAILWITH(IERR_INVALID_ARG);
@@ -768,11 +768,11 @@ iERR ion_stream_write(ION_STREAM *stream, BYTE *buf, SIZE len, SIZE *p_bytes_wri
   // and if we have more to write we seek to fetch the next page
   // which will flush the current page to the output stream
   while (src_remaining > 0) {
-    to_write = stream->_buffer_size - (SIZE)(stream->_curr - stream->_buffer); // should be limited by page size
+    to_write = stream->_buffer_size - (ION_SIZE)(stream->_curr - stream->_buffer); // should be limited by page size
     if (to_write < 1) {
       // if there's no room get the next page
       IONCHECK(_ion_stream_fetch_position( stream, _ion_stream_position(stream) ));
-      to_write = stream->_buffer_size - (SIZE)(stream->_curr - stream->_buffer); // limited by page size
+      to_write = stream->_buffer_size - (ION_SIZE)(stream->_curr - stream->_buffer); // limited by page size
     }
     dst = stream->_curr;
     if (to_write > src_remaining) {
@@ -858,10 +858,10 @@ iERR ion_stream_write_byte_no_checks(ION_STREAM *stream, int byte)
 
 // this writes some number of bytes from an input stream
 // to this (target) output stream
-iERR ion_stream_write_stream( ION_STREAM *stream, ION_STREAM *stream_input, SIZE len, SIZE *p_written )
+iERR ion_stream_write_stream( ION_STREAM *stream, ION_STREAM *stream_input, ION_SIZE len, ION_SIZE *p_written )
 {
   iENTER;
-  SIZE written = 0, planned_bytes, actual_bytes, remaining;
+  ION_SIZE written = 0, planned_bytes, actual_bytes, remaining;
   BYTE temp_buffer[TEMP_BUFFER_LEN];
 
   if (!stream) FAILWITH(IERR_INVALID_ARG);
@@ -962,11 +962,11 @@ iERR ion_stream_seek( ION_STREAM *stream, POSITION target_pos)
 }
 
 // skip <distance> from current position, return actual distance skipped in case it hits an edge first
-iERR ion_stream_skip( ION_STREAM *stream, SIZE distance, SIZE *p_skipped)
+iERR ion_stream_skip( ION_STREAM *stream, ION_SIZE distance, ION_SIZE *p_skipped)
 {
   iENTER;
   POSITION original_pos, target_pos, actual_pos;
-  SIZE     skipped;  
+  ION_SIZE     skipped;  
   
   if (!stream) FAILWITH(IERR_INVALID_ARG);
   if (!p_skipped) FAILWITH(IERR_INVALID_ARG);
@@ -977,7 +977,7 @@ iERR ion_stream_skip( ION_STREAM *stream, SIZE distance, SIZE *p_skipped)
   actual_pos = _ion_stream_position(stream);
    
   ASSERT((actual_pos - original_pos) <= (POSITION)distance); // we should never overshoot
-  skipped = (SIZE)(actual_pos - original_pos);
+  skipped = (ION_SIZE)(actual_pos - original_pos);
   *p_skipped = skipped;
   
   iRETURN;
@@ -1118,11 +1118,11 @@ iERR _ion_stream_mark_clear_helper( ION_STREAM_PAGED *paged, POSITION position )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-iERR _ion_stream_open_helper(ION_STREAM_FLAG flags, SIZE page_size, ION_STREAM **pp_stream)
+iERR _ion_stream_open_helper(ION_STREAM_FLAG flags, ION_SIZE page_size, ION_STREAM **pp_stream)
 {
   iENTER;
   BOOL              user_buffer, user_managed;
-  SIZE              len;
+  ION_SIZE              len;
   ION_STREAM       *stream = NULL;
   ION_STREAM_PAGED *paged;
   ION_INDEX_OPTIONS index_options;
@@ -1184,7 +1184,7 @@ iERR _ion_stream_flush_helper(ION_STREAM *stream)
 {
   iENTER;
   POSITION position;
-  SIZE     written, available;
+  ION_SIZE     written, available;
   struct _ion_user_stream  *user_stream;
 
   ASSERT(stream);
@@ -1197,7 +1197,7 @@ iERR _ion_stream_flush_helper(ION_STREAM *stream)
       if (_ion_stream_is_user_controlled(stream)) {
         user_stream = &(((ION_STREAM_USER_PAGED *)stream)->_user_stream);
         while (stream->_dirty_length > 0) {
-            available = (SIZE)(user_stream->limit - user_stream->curr);
+            available = (ION_SIZE)(user_stream->limit - user_stream->curr);
             if (available > stream->_dirty_length) {
                 available = stream->_dirty_length;
             }
@@ -1209,14 +1209,14 @@ iERR _ion_stream_flush_helper(ION_STREAM *stream)
         }
       }
       else if (_ion_stream_is_fd_backed(stream)) {
-        written = (SIZE)WRITE( (int)stream->_fp, stream->_dirty_start, stream->_dirty_length );
+        written = (ION_SIZE)WRITE( (int)stream->_fp, stream->_dirty_start, stream->_dirty_length );
         if (written != stream->_dirty_length) {
           FAILWITH( IERR_WRITE_ERROR );
         }
       }
 	  else {
 		ASSERT(_ion_stream_is_file_backed(stream));
-		written = (SIZE)fwrite( stream->_dirty_start, sizeof(BYTE), stream->_dirty_length, stream->_fp );
+		written = (ION_SIZE)fwrite( stream->_dirty_start, sizeof(BYTE), stream->_dirty_length, stream->_fp );
 
 		if (written != stream->_dirty_length) {
 
@@ -1363,7 +1363,7 @@ PAGE_ID _ion_stream_page_id_from_offset( ION_STREAM *stream, POSITION file_offse
   ASSERT(file_offset >= 0);
 
   if (stream->_buffer_size > 0) {
-      page_id = (SIZE)(file_offset / ((POSITION)stream->_buffer_size));
+      page_id = (ION_SIZE)(file_offset / ((POSITION)stream->_buffer_size));
   }
   else {
       page_id = 0;
@@ -1535,7 +1535,7 @@ iERR _ion_stream_fetch_fill_page( ION_STREAM *stream, ION_PAGE *page, POSITION t
     ION_STREAM_PAGED *paged = PAGED_STREAM(stream);
     POSITION          page_read_position;
     BYTE             *dst, *end;
-    SIZE              end_buf_offset, bytes_needed_user, bytes_needed_buffer, local_bytes_read;
+    ION_SIZE              end_buf_offset, bytes_needed_user, bytes_needed_buffer, local_bytes_read;
     
     ASSERT(stream);
     ASSERT(_ion_stream_is_paged(stream));
@@ -1549,7 +1549,7 @@ iERR _ion_stream_fetch_fill_page( ION_STREAM *stream, ION_PAGE *page, POSITION t
 
     ASSERT((target_position - page_read_position) < MAX_SIZE);
 
-    bytes_needed_user = bytes_needed_buffer = (SIZE)(target_position - page_read_position) + 1;
+    bytes_needed_user = bytes_needed_buffer = (ION_SIZE)(target_position - page_read_position) + 1;
     if (bytes_needed_user < (stream->_buffer_size - end_buf_offset)) {
         bytes_needed_buffer = (stream->_buffer_size - end_buf_offset);
     }
@@ -1642,7 +1642,7 @@ iERR _ion_stream_read_for_seek( ION_STREAM *stream, POSITION target_position )
     BYTE              local_fake_buffer[LOCAL_FAKE_PAGE_SIZE], *dst, *end;
     PAGE_ID           current_page_id;
     POSITION          current_position;
-    SIZE              bytes_read;
+    ION_SIZE              bytes_read;
 
     ASSERT(stream);
     ASSERT(_ion_stream_is_paged(stream));
@@ -1660,8 +1660,8 @@ iERR _ion_stream_read_for_seek( ION_STREAM *stream, POSITION target_position )
         current_page_id   =  page->_page_id;
         if (page == paged->_curr_page) {
             current_position  = stream->_offset;
-            page->_page_start = (SIZE)(stream->_buffer - page->_buf);
-            page->_page_limit = (SIZE)(stream->_limit  - page->_buf);
+            page->_page_start = (ION_SIZE)(stream->_buffer - page->_buf);
+            page->_page_limit = (ION_SIZE)(stream->_limit  - page->_buf);
         }
         else {
             current_position  = _ion_stream_offset_from_page_id(stream, current_page_id);
@@ -1714,8 +1714,8 @@ iERR _ion_stream_read_for_seek( ION_STREAM *stream, POSITION target_position )
         }
 
         // we shorten end if our target position is inside the current page
-        if ((SIZE)(end - dst) > (SIZE)(target_position - current_position)) {
-            end = dst + (SIZE)(target_position - current_position);
+        if ((ION_SIZE)(end - dst) > (ION_SIZE)(target_position - current_position)) {
+            end = dst + (ION_SIZE)(target_position - current_position);
         }
 
         if (dst < end) {
@@ -1755,12 +1755,12 @@ iERR _ion_stream_read_for_seek( ION_STREAM *stream, POSITION target_position )
     iRETURN;
 }
 
-iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_read)
+iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, ION_SIZE *p_bytes_read)
 {
     iENTER;
     ION_STREAM_PAGED *paged = PAGED_STREAM(stream);
     struct _ion_user_stream *user_stream = NULL;
-    SIZE              local_bytes_read, needed, bytes_read = 0;
+    ION_SIZE              local_bytes_read, needed, bytes_read = 0;
 
     ASSERT(stream);
     ASSERT(_ion_stream_is_paged(stream));
@@ -1796,12 +1796,12 @@ iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_
         // first check to see if we have any pending bytes, from a previous read
         if (user_stream->curr == NULL 
          || user_stream->limit == NULL
-         || ((bytes_read = (SIZE)(user_stream->limit - user_stream->curr)) < 1)
+         || ((bytes_read = (ION_SIZE)(user_stream->limit - user_stream->curr)) < 1)
         ) {
           // if we didn't have anything, call the handler to get more bytes
           switch((err = (*(user_stream->handler))(user_stream))) {
           case IERR_OK:
-            bytes_read = (SIZE)(user_stream->limit - user_stream->curr);
+            bytes_read = (ION_SIZE)(user_stream->limit - user_stream->curr);
             break;
           case IERR_EOF:
             bytes_read = 0;
@@ -1814,7 +1814,7 @@ iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_
         // now, if we have bytes and no error, copy over what we got, or a page full
         // whichever is shorter (if we don't copy the whole page we'll get more on our next pass)
         if (bytes_read > 0) {
-          needed = (SIZE)(end - dst);
+          needed = (ION_SIZE)(end - dst);
           if (bytes_read > needed) {
               bytes_read = needed;
           }
@@ -1826,9 +1826,9 @@ iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_
         //
         // read a page from the underlying FILE*
         //
-        local_bytes_read = (SIZE)(end - dst);
+        local_bytes_read = (ION_SIZE)(end - dst);
 		if (_ion_stream_is_fd_backed(stream)) {
-	        bytes_read = (SIZE)READ((int)stream->_fp, dst, local_bytes_read);
+	        bytes_read = (ION_SIZE)READ((int)stream->_fp, dst, local_bytes_read);
 		    if (bytes_read < 0) {
 			    bytes_read = READ_ERROR_LENGTH;
 			}	
@@ -1837,7 +1837,7 @@ iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_
 			}	
 		}
 		else {
-			bytes_read = (SIZE)fread(dst, sizeof(BYTE), local_bytes_read, stream->_fp);
+			bytes_read = (ION_SIZE)fread(dst, sizeof(BYTE), local_bytes_read, stream->_fp);
 			if (ferror(stream->_fp)) {
 				bytes_read = READ_ERROR_LENGTH;
 			}
@@ -1851,13 +1851,13 @@ iERR _ion_stream_fread( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_
 }
 
 
-iERR _ion_stream_console_read( ION_STREAM *stream, BYTE *buf, BYTE *end, SIZE *p_bytes_read)
+iERR _ion_stream_console_read( ION_STREAM *stream, BYTE *buf, BYTE *end, ION_SIZE *p_bytes_read)
 {
     iENTER;
     ION_STREAM_PAGED *paged = PAGED_STREAM(stream);
     BYTE             *dst = buf;
     int               c;
-    SIZE              bytes_read;
+    ION_SIZE              bytes_read;
     BOOL              saw_cr = FALSE, anything_read = FALSE;
 
     ASSERT(stream);
@@ -1885,7 +1885,7 @@ iERR _ion_stream_console_read( ION_STREAM *stream, BYTE *buf, BYTE *end, SIZE *p
     // fall through to "break_on_eof", since we've read enough
 
 break_on_eof: 
-    bytes_read = (SIZE)(dst - buf);
+    bytes_read = (ION_SIZE)(dst - buf);
     if (!anything_read && feof(stream->_fp)) { // was, but it seems the optimizer didn't like this: bytes_read == 0 && feof(stream->_fp)) {
         // we only treat the eof as an eof if we
         // were not able to read any bytes
@@ -1943,7 +1943,7 @@ iERR _ion_stream_page_allocate(ION_STREAM_PAGED *paged, PAGE_ID page_id, ION_PAG
 {
   iENTER;
   ION_PAGE *page = NULL;
-  SIZE      size;
+  ION_SIZE      size;
    
   ASSERT(paged);
   ASSERT(pp_page);
@@ -2100,8 +2100,8 @@ iERR _ion_stream_page_make_current(ION_STREAM_PAGED *paged, ION_PAGE *page)
       else {
         // if we're not releasing the page we need to update the page values
         currpage = paged->_curr_page;
-        currpage->_page_start = (SIZE)(stream->_buffer - currpage->_buf);
-        currpage->_page_limit = (SIZE)(stream->_limit  - currpage->_buf);
+        currpage->_page_start = (ION_SIZE)(stream->_buffer - currpage->_buf);
+        currpage->_page_limit = (ION_SIZE)(stream->_limit  - currpage->_buf);
       }
   }
    

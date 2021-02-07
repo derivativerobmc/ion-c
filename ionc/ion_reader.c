@@ -21,7 +21,7 @@
                                 }                                               \
                             }
 
-iERR ion_reader_open_buffer(hREADER *p_hreader, BYTE *buffer, SIZE buf_length, ION_READER_OPTIONS *p_options)
+iERR ion_reader_open_buffer(hREADER *p_hreader, BYTE *buffer, ION_SIZE buf_length, ION_READER_OPTIONS *p_options)
 {
     iENTER;
     ION_READER *preader = NULL;
@@ -35,7 +35,7 @@ iERR ion_reader_open_buffer(hREADER *p_hreader, BYTE *buffer, SIZE buf_length, I
     iRETURN;
 }
 
-iERR _ion_reader_open_buffer_helper(ION_READER **p_preader, BYTE *buffer, SIZE buf_length, ION_READER_OPTIONS *p_options)
+iERR _ion_reader_open_buffer_helper(ION_READER **p_preader, BYTE *buffer, ION_SIZE buf_length, ION_READER_OPTIONS *p_options)
 {
     iENTER;
     ION_READER *preader = NULL;
@@ -279,7 +279,7 @@ iERR _ion_reader_make_new_reader(ION_READER_OPTIONS *p_options, ION_READER **p_r
 {
     iENTER;
     ION_READER *preader = NULL;
-    SIZE        len;
+    ION_SIZE        len;
 
     ASSERT(p_reader);
     // and p_options might or might not be NULL
@@ -438,7 +438,7 @@ iERR _ion_reader_validate_options(ION_READER_OPTIONS* p_options)
     iRETURN;
 }
 
-iERR _ion_reader_initialize(ION_READER *preader, BYTE *version_buffer, SIZE version_length)
+iERR _ion_reader_initialize(ION_READER *preader, BYTE *version_buffer, ION_SIZE version_length)
 {
     iENTER;
     hCATALOG            hcatalog;
@@ -650,7 +650,7 @@ iERR _ion_reader_step_out_helper(ION_READER *preader)
     iRETURN;
 }
 
-iERR ion_reader_get_depth(hREADER hreader, SIZE *p_depth)
+iERR ion_reader_get_depth(hREADER hreader, ION_SIZE *p_depth)
 {
     iENTER;
     ION_READER *preader;
@@ -664,7 +664,7 @@ iERR ion_reader_get_depth(hREADER hreader, SIZE *p_depth)
     iRETURN;
 }
 
-iERR _ion_reader_get_depth_helper(ION_READER *preader, SIZE *p_depth)
+iERR _ion_reader_get_depth_helper(ION_READER *preader, ION_SIZE *p_depth)
 {
     iENTER;
 
@@ -1010,7 +1010,7 @@ iERR _ion_reader_get_field_name_helper(ION_READER *preader, ION_STRING **p_pstr)
     iRETURN;
 }
 
-iERR _ion_reader_get_field_sid_helper(ION_READER *preader, SID *p_sid)
+iERR _ion_reader_get_field_sid_helper(ION_READER *preader, ION_SID *p_sid)
 {
     iENTER;
 
@@ -1068,7 +1068,7 @@ iERR _ion_reader_get_field_name_symbol_helper(ION_READER *preader, ION_SYMBOL **
     iRETURN;
 }
 
-iERR ion_reader_get_annotations(hREADER hreader, iSTRING p_strs, SIZE max_count, SIZE *p_count)
+iERR ion_reader_get_annotations(hREADER hreader, iSTRING p_strs, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
     ION_READER *preader;
@@ -1083,7 +1083,7 @@ iERR ion_reader_get_annotations(hREADER hreader, iSTRING p_strs, SIZE max_count,
     iRETURN;
 }
 
-iERR _ion_reader_get_annotations_helper(ION_READER *preader, ION_STRING *p_strs, SIZE max_count, SIZE *p_count)
+iERR _ion_reader_get_annotations_helper(ION_READER *preader, ION_STRING *p_strs, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
 
@@ -1106,7 +1106,7 @@ iERR _ion_reader_get_annotations_helper(ION_READER *preader, ION_STRING *p_strs,
     iRETURN;
 }
 
-iERR ion_reader_get_annotation_symbols(hREADER hreader, ION_SYMBOL *p_symbols, SIZE max_count, SIZE *p_count)
+iERR ion_reader_get_annotation_symbols(hREADER hreader, ION_SYMBOL *p_symbols, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
     ION_READER *preader;
@@ -1554,7 +1554,7 @@ iERR _ion_reader_read_symbol_helper(ION_READER *preader, ION_SYMBOL *p_symbol)
     iRETURN;
 }
 
-iERR ion_reader_get_string_length(hREADER hreader, SIZE *p_length)
+iERR ion_reader_get_string_length(hREADER hreader, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER *preader;
@@ -1568,7 +1568,7 @@ iERR ion_reader_get_string_length(hREADER hreader, SIZE *p_length)
     iRETURN;
 }
 
-iERR _ion_reader_get_string_length_helper(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_get_string_length_helper(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
 
@@ -1629,11 +1629,11 @@ iERR _ion_reader_read_string_helper(ION_READER *preader, ION_STRING *p_value)
     iRETURN;
 }
 
-iERR ion_reader_read_partial_string (hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length)
+iERR ion_reader_read_partial_string (hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER *preader = HANDLE_TO_PTR(hreader, ION_READER);
-    SIZE        read_length;
+    ION_SIZE        read_length;
 
     if (!hreader)    FAILWITH(IERR_INVALID_ARG);
     if (!p_buf)      FAILWITH(IERR_INVALID_ARG);
@@ -1646,7 +1646,7 @@ iERR ion_reader_read_partial_string (hREADER hreader, BYTE *p_buf, SIZE buf_max,
     iRETURN;
 }
 
-iERR _ion_reader_read_partial_string_helper(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) 
+iERR _ion_reader_read_partial_string_helper(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) 
 {
     iENTER;
 
@@ -1669,7 +1669,7 @@ iERR _ion_reader_read_partial_string_helper(ION_READER *preader, BOOL accept_par
     iRETURN;
 }
 
-iERR ion_reader_get_lob_size(hREADER hreader, SIZE *p_length)
+iERR ion_reader_get_lob_size(hREADER hreader, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER *preader;
@@ -1683,7 +1683,7 @@ iERR ion_reader_get_lob_size(hREADER hreader, SIZE *p_length)
     iRETURN;
 }
 
-iERR _ion_reader_get_lob_size_helper(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_get_lob_size_helper(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
 
@@ -1705,7 +1705,7 @@ iERR _ion_reader_get_lob_size_helper(ION_READER *preader, SIZE *p_length)
     iRETURN;
 }
 
-iERR ion_reader_read_lob_bytes(hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length)
+iERR ion_reader_read_lob_bytes(hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER *preader = HANDLE_TO_PTR(hreader, ION_READER);
@@ -1720,11 +1720,11 @@ iERR ion_reader_read_lob_bytes(hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE 
     iRETURN;
 }
 
-iERR ion_reader_read_lob_partial_bytes(hREADER hreader, BYTE *p_buf, SIZE buf_max, SIZE *p_length)
+iERR ion_reader_read_lob_partial_bytes(hREADER hreader, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER *preader = HANDLE_TO_PTR(hreader, ION_READER);
-    SIZE        read_length;
+    ION_SIZE        read_length;
 
     if (!hreader) FAILWITH(IERR_INVALID_ARG);
     if (!p_buf) FAILWITH(IERR_INVALID_ARG);
@@ -1738,7 +1738,7 @@ iERR ion_reader_read_lob_partial_bytes(hREADER hreader, BYTE *p_buf, SIZE buf_ma
     iRETURN;
 }
 
-iERR _ion_reader_read_lob_bytes_helper(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) 
+iERR _ion_reader_read_lob_bytes_helper(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) 
 {
     iENTER;
 
@@ -1987,7 +1987,7 @@ iERR _ion_reader_get_position_helper(ION_READER *preader, int64_t *p_bytes, int3
  *  is present).  At that point the symbol table will be current
  *  and later seek's will have an appropriate symbol table to use.
  */
-iERR ion_reader_seek(hREADER hreader, POSITION offset, SIZE length)
+iERR ion_reader_seek(hREADER hreader, POSITION offset, ION_SIZE length)
 {
     iENTER;
     ION_READER *preader;
@@ -2145,11 +2145,11 @@ iERR ion_reader_get_value_offset(hREADER hreader, POSITION *p_offset)
  *  the underlying stream which could result in errors that
  *  are not really of intereest.
  */
-iERR ion_reader_get_value_length(hREADER hreader, SIZE *p_length)
+iERR ion_reader_get_value_length(hREADER hreader, ION_SIZE *p_length)
 {
     iENTER;
     ION_READER       *preader;
-    SIZE              len;
+    ION_SIZE              len;
 
     if (!hreader) FAILWITH(IERR_INVALID_ARG);
     preader = HANDLE_TO_PTR(hreader, ION_READER);

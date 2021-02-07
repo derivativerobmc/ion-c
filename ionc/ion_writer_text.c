@@ -203,8 +203,8 @@ iERR _ion_writer_text_write_stream_start(ION_WRITER *pwriter)
     int ii;
     ION_SYMBOL lst_annotation;
     ION_SYMBOL *stashed_annotations;
-    SIZE stashed_annotation_curr;
-    SIZE stashed_annotation_count;
+    ION_SIZE stashed_annotation_curr;
+    ION_SIZE stashed_annotation_count;
 
     if (pwriter->_needs_version_marker) {
         for (ii = 0; ii < ION_SYMBOL_VTM_STRING.length; ii++) {
@@ -444,7 +444,7 @@ iERR _ion_writer_text_write_ion_int(ION_WRITER *pwriter, ION_INT *iint)
     int       is_negative = FALSE, decimal_digits;
     II_DIGIT  small_copy[II_SMALL_DIGIT_ARRAY_LENGTH];
     II_DIGIT *digits = NULL, remainder;
-    SIZE    digits_length;
+    ION_SIZE    digits_length;
 
 
     IONCHECK(_ion_writer_text_start_value(pwriter));
@@ -630,7 +630,7 @@ iERR _ion_writer_text_write_timestamp(ION_WRITER *pwriter, iTIMESTAMP value)
 {
     iENTER;
     char temp[ION_TIMESTAMP_STRING_LENGTH + 1];
-    SIZE output_length;
+    ION_SIZE output_length;
 
     ASSERT(pwriter);
 
@@ -641,7 +641,7 @@ iERR _ion_writer_text_write_timestamp(ION_WRITER *pwriter, iTIMESTAMP value)
         IONCHECK(_ion_writer_text_start_value(pwriter));
 
         // the timestamp utility routine does most of the work
-        IONCHECK(ion_timestamp_to_string(value, temp, (SIZE)sizeof(temp), &output_length, &pwriter->deccontext));
+        IONCHECK(ion_timestamp_to_string(value, temp, (ION_SIZE)sizeof(temp), &output_length, &pwriter->deccontext));
         temp[output_length] = '\0';
 
         // and our helper does the rest
@@ -656,7 +656,7 @@ iERR _ion_writer_text_write_symbol_from_string(ION_WRITER *pwriter, ION_STRING *
 {
     iENTER;
     ION_STREAM *poutput;
-    SIZE written;
+    ION_SIZE written;
 
     if (pwriter->depth == 0 && pwriter->annotation_count == 0 && pstr->value[0] == '$'
         && _ion_symbol_table_parse_version_marker(pstr, NULL, NULL)) {
@@ -691,7 +691,7 @@ iERR _ion_writer_text_write_symbol_from_string(ION_WRITER *pwriter, ION_STRING *
     iRETURN;
 }
 
-iERR _ion_writer_text_write_symbol_id(ION_WRITER *pwriter, SID sid)
+iERR _ion_writer_text_write_symbol_id(ION_WRITER *pwriter, ION_SID sid)
 {
     iENTER;
     ION_STRING       *pstr = NULL;
@@ -762,7 +762,7 @@ iERR _ion_writer_text_write_string(ION_WRITER *pwriter, iSTRING str)
     iRETURN;
 }
 
-iERR _ion_writer_text_write_clob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_text_write_clob(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
 
@@ -784,7 +784,7 @@ iERR _ion_writer_text_write_clob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
     iRETURN;
 }
 
-iERR _ion_writer_text_append_clob_contents(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_text_append_clob_contents(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     int ii;
@@ -812,7 +812,7 @@ iERR _ion_writer_text_append_clob_contents(ION_WRITER *pwriter, BYTE *p_buf, SIZ
     iRETURN;
 }
 
-iERR _ion_writer_text_write_blob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_text_write_blob(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
 
@@ -836,7 +836,7 @@ iERR _ion_writer_text_write_blob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
     iRETURN;
 }
 
-iERR _ion_writer_text_append_blob_contents(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_text_append_blob_contents(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     char image[5];
@@ -981,7 +981,7 @@ iERR _ion_writer_text_start_lob(ION_WRITER *pwriter, ION_TYPE lob_type)
     iRETURN;
 }
 
-iERR _ion_writer_text_append_lob(ION_WRITER *pwriter, BYTE *p_buf, SIZE length)
+iERR _ion_writer_text_append_lob(ION_WRITER *pwriter, BYTE *p_buf, ION_SIZE length)
 {
     iENTER;
     ION_TYPE lob_type;
@@ -1108,7 +1108,7 @@ iERR _ion_writer_text_close(ION_WRITER *pwriter)
 iERR _ion_writer_text_append_symbol_string(ION_STREAM *poutput, ION_STRING *p_str, BOOL as_ascii, BOOL system_identifiers_need_quotes)
 {
     iENTER;
-    SIZE written;
+    ION_SIZE written;
 
     if (!poutput) FAILWITH(IERR_BAD_HANDLE);
     if (!p_str) FAILWITH(IERR_INVALID_ARG);
@@ -1153,7 +1153,7 @@ iERR _ion_writer_text_append_escape_sequence_string(ION_STREAM *poutput, BYTE *c
     iENTER;
     char   unicode_buffer[4];  // unicode byte sequences are less than 4 bytes long
     char  *image;
-    SIZE len, ii;
+    ION_SIZE len, ii;
     int    c, unicode_scalar, ilen;
 
     c = *cp;
@@ -1163,7 +1163,7 @@ iERR _ion_writer_text_append_escape_sequence_string(ION_STREAM *poutput, BYTE *c
         cp++;
     }
     else {
-        len = (SIZE)(limit - cp);
+        len = (ION_SIZE)(limit - cp);
         if (len > 4) len = 4;
         for (ii=0; ii<len; ii++) {
             unicode_buffer[ii] = cp[ii];
@@ -1185,7 +1185,7 @@ iERR _ion_writer_text_append_escape_sequence_cstr_limit(ION_STREAM *poutput, cha
     char  *image;
     char   temp_buffer[4];
     int    unicode_scalar, ilen;
-    SIZE len;
+    ION_SIZE len;
 
     if (*cp < 32) {
         image = _ion_writer_get_control_escape_string(*cp);
@@ -1193,7 +1193,7 @@ iERR _ion_writer_text_append_escape_sequence_cstr_limit(ION_STREAM *poutput, cha
         cp++;
     }
     else {
-        len = (SIZE)(limit - cp);
+        len = (ION_SIZE)(limit - cp);
         if (len > 4) len = 4;
         strncpy(temp_buffer, cp, len);
         IONCHECK(_ion_writer_text_read_unicode_scalar(temp_buffer, &ilen, &unicode_scalar));

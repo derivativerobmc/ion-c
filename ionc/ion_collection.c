@@ -46,7 +46,7 @@ void                 _ion_collection_clear_data        (ION_COLLECTION *collecti
 
 
 // public functions
-void _ion_collection_initialize(hOWNER allocation_owner, ION_COLLECTION *collection, SIZE data_length)
+void _ion_collection_initialize(hOWNER allocation_owner, ION_COLLECTION *collection, ION_SIZE data_length)
 {
     ASSERT( allocation_owner != NULL );
     ASSERT( collection != NULL );

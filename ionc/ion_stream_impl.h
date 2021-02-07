@@ -166,7 +166,7 @@ typedef uint32_t  ION_STREAM_FLAG;
 
 #define IH_DEFAULT_PAGE_SIZE    (1024*8)
 
-GLOBAL SIZE g_Ion_Stream_Default_Page_Size INITTO(IH_DEFAULT_PAGE_SIZE);  // a global so we could choose to change a runtime with effort
+GLOBAL ION_SIZE g_Ion_Stream_Default_Page_Size INITTO(IH_DEFAULT_PAGE_SIZE);  // a global so we could choose to change a runtime with effort
 
 struct _ion_stream
 {
@@ -175,7 +175,7 @@ struct _ion_stream
                                   // IS_OPEN, IS_DIRTY, IS_AT_EOF, IS_FAKE_PAGE, 
   FILE            *_fp;           // current file for read or read/write (will be NULL if user buffer)
   BYTE            *_buffer;       // current page of data in use
-  SIZE             _buffer_size;  // current buffer size, this is page size if the is a paged stream, otherwise it's the one and only buffer length
+  ION_SIZE             _buffer_size;  // current buffer size, this is page size if the is a paged stream, otherwise it's the one and only buffer length
   POSITION         _offset;       // offset of first byte of buffer in source
   BYTE            *_curr;         // position = _offset + (_curr - _buffer)
   BYTE            *_limit;        // end of buffered data
@@ -183,7 +183,7 @@ struct _ion_stream
   POSITION         _mark;         // -1 for no mark otherwise the file position where the mark started
 
   BYTE            *_dirty_start;  // pointer to first dirty byte in current buffer
-  SIZE             _dirty_length; // number of dirty bytes (only contiguous bytes in the current buffer are allowed to be dirty)
+  ION_SIZE             _dirty_length; // number of dirty bytes (only contiguous bytes in the current buffer are allowed to be dirty)
 };
 
 struct _ion_stream_paged // extends _ion_stream
@@ -191,7 +191,7 @@ struct _ion_stream_paged // extends _ion_stream
   ION_STREAM        _base;
   ION_PAGE         *_curr_page;   // the current page we're on (may be NULL) TODO - should this be an idx?
   ION_PAGE         *_last_page;   // this is really the furthest page read, used for sequential reads
-  SIZE              _page_size;   // size of buffers in all pages
+  ION_SIZE              _page_size;   // size of buffers in all pages
   ION_PAGE         *_free_pages;  // list of allocated pages but unused pages 
   // the ION_INDEX is a hashed index which requires pages to all be the same 
   // size so that locations can be converted to page numbers functionally
@@ -208,8 +208,8 @@ struct _ion_page
 {
   ION_PAGE         *_next_free;
   PAGE_ID           _page_id;     // which page in the file is this (this equals position modulo page size)
-  SIZE              _page_start;  // offset of the first byte of filled data, this is 0 unless the page has been filled via unread
-  SIZE              _page_limit;  // number of bytes filled in the current page buf
+  ION_SIZE              _page_start;  // offset of the first byte of filled data, this is 0 unless the page has been filled via unread
+  ION_SIZE              _page_limit;  // number of bytes filled in the current page buf
   BYTE              _buf[0];      // buffer of bytes, the size is _ion_stream_paged->_page_size
 };
 
@@ -222,7 +222,7 @@ struct _ion_page
 #define PAGED_STREAM( stream )  ((ION_STREAM_PAGED *)(stream))
 #define UNPAGED_STREAM( paged ) ((ION_STREAM *)(&(paged->_base)))
 #define IH_POSITION_OF( ptr )   (stream->_offset + ((ptr) - stream->_buffer))
-#define IH_CURR_OF( pos )       (stream->_buffer + ((pos) - stream->_offset))  /* WARNING: this might need a cast of the pos-offset to SIZE */
+#define IH_CURR_OF( pos )       (stream->_buffer + ((pos) - stream->_offset))  /* WARNING: this might need a cast of the pos-offset to ION_SIZE */
 
 #define ION_INPUT_STREAM_POSITION(s) ion_stream_get_position(s)
 
@@ -233,7 +233,7 @@ struct _ion_page
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-iERR _ion_stream_open_helper( ION_STREAM_FLAG flags, SIZE page_size, ION_STREAM **pp_stream );
+iERR _ion_stream_open_helper( ION_STREAM_FLAG flags, ION_SIZE page_size, ION_STREAM **pp_stream );
 iERR _ion_stream_flush_helper( ION_STREAM *stream );
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,8 +279,8 @@ iERR _ion_stream_fetch_position           ( ION_STREAM *stream, POSITION positio
 iERR _ion_stream_fetch_fill_page          ( ION_STREAM *stream, ION_PAGE *page, POSITION target_position );
 iERR _ion_stream_fseek                    ( ION_STREAM *stream, POSITION target_position );
 iERR _ion_stream_read_for_seek            ( ION_STREAM *stream, POSITION target_position );
-iERR _ion_stream_fread                    ( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_read);
-iERR _ion_stream_console_read             ( ION_STREAM *stream, BYTE *dst, BYTE *end, SIZE *p_bytes_read);
+iERR _ion_stream_fread                    ( ION_STREAM *stream, BYTE *dst, BYTE *end, ION_SIZE *p_bytes_read);
+iERR _ion_stream_console_read             ( ION_STREAM *stream, BYTE *dst, BYTE *end, ION_SIZE *p_bytes_read);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 

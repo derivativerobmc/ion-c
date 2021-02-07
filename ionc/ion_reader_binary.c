@@ -21,7 +21,7 @@
 #include "ion_reader_impl.h"
 
 iERR _ion_reader_binary_local_read_length(ION_READER *preader, int tid, int *p_length);
-iERR _ion_binary_reader_fits_container(ION_READER *preader, SIZE len);
+iERR _ion_binary_reader_fits_container(ION_READER *preader, ION_SIZE len);
 iERR _ion_reader_binary_local_process_possible_magic_cookie(ION_READER *preader, int td, BOOL *p_is_system_value);
 
 //
@@ -38,7 +38,7 @@ iERR _ion_reader_binary_open(ION_READER *preader)
     binary = &preader->typed_reader.binary;
 
     _ion_collection_initialize(preader, &binary->_parent_stack, sizeof(BINARY_PARENT_STATE)); // array of BINARY_PARENT_STATE
-    _ion_collection_initialize(preader, &binary->_annotation_sids, sizeof(SID)); // array of SID's
+    _ion_collection_initialize(preader, &binary->_annotation_sids, sizeof(ION_SID)); // array of ION_SID's
 
     binary->_local_end = ION_STREAM_MAX_LENGTH;
     binary->_state = S_BEFORE_TID;
@@ -65,7 +65,7 @@ iERR _ion_reader_binary_reset(ION_READER *preader, ION_TYPE parent_tid, POSITION
     binary = &preader->typed_reader.binary;
 
     _ion_collection_reset(&binary->_parent_stack); // array of BINARY_PARENT_STATE
-    _ion_collection_reset(&binary->_annotation_sids); // array of SID's
+    _ion_collection_reset(&binary->_annotation_sids); // array of ION_SID's
 
     binary->_state = S_BEFORE_TID;
 
@@ -100,8 +100,8 @@ iERR _ion_reader_binary_next(ION_READER *preader, ION_TYPE *p_value_type)
     int                type_desc_byte, ion_type_id;
     int                length;
     uint32_t           field_sid, annotation_len;
-    SIZE               skipped;
-    SID               *psid;
+    ION_SIZE               skipped;
+    ION_SID               *psid;
     BOOL               is_system_value = FALSE;
     POSITION           annotation_content_start, value_content_start;
     BINARY_STATE       next_state = S_BEFORE_CONTENTS;
@@ -191,7 +191,7 @@ begin:
             for (;;) {
                 pos = ion_stream_get_position(preader->istream);
                 if (pos >= annotation_end) break;
-                psid = (SID *)_ion_collection_append(&binary->_annotation_sids);
+                psid = (ION_SID *)_ion_collection_append(&binary->_annotation_sids);
                 if (!psid) FAILWITH(IERR_NO_MEMORY);
                 IONCHECK(ion_binary_read_var_uint_32(preader->istream, (uint32_t*)psid));
             }
@@ -241,7 +241,7 @@ begin:
             binary->_annotation_start = -1;
             IONCHECK(_ion_reader_binary_local_read_length(preader, binary->_value_tid, &binary->_value_len));
             if (getTypeCode(type_desc_byte) == TID_SYMBOL) {
-                // A non-null symbol at the top-level, not in an annotation wrapper, with SID 2 is a faux IVM (a no-op).
+                // A non-null symbol at the top-level, not in an annotation wrapper, with ION_SID 2 is a faux IVM (a no-op).
                 if (getLowNibble(type_desc_byte) != ION_lnIsNull) {
                     IONCHECK(_ion_reader_binary_read_symbol_sid_helper(preader, binary, &binary->_value_symbol_id));
                     // The state must indicate that the value has already been read to avoid skipping too many bytes
@@ -346,7 +346,7 @@ iERR _ion_reader_binary_step_out(ION_READER *preader)
     ION_BINARY_READER   *binary;
     BINARY_PARENT_STATE *pparent_state;
     int64_t              to_skip, next_start, curr_pos;
-    SIZE                 this_skip, one_skip;
+    ION_SIZE                 this_skip, one_skip;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
 
@@ -377,7 +377,7 @@ iERR _ion_reader_binary_step_out(ION_READER *preader)
                 one_skip = MAX_SIZE;
             }
             else {
-                one_skip = (SIZE)to_skip;
+                one_skip = (ION_SIZE)to_skip;
             }
             IONCHECK(ion_stream_skip(preader->istream, one_skip, &this_skip));
             if (one_skip != this_skip) FAILWITH(IERR_UNEXPECTED_EOF);
@@ -393,7 +393,7 @@ iERR _ion_reader_binary_step_out(ION_READER *preader)
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_depth(ION_READER *preader, SIZE *p_depth)
+iERR _ion_reader_binary_get_depth(ION_READER *preader, ION_SIZE *p_depth)
 {
     ASSERT(preader && preader->type == ion_type_binary_reader);
 
@@ -402,11 +402,11 @@ iERR _ion_reader_binary_get_depth(ION_READER *preader, SIZE *p_depth)
     return IERR_OK;
 }
 
-iERR _ion_reader_binary_get_value_length(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_binary_get_value_length(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_BINARY_READER *binary;
-    SIZE               length;
+    ION_SIZE               length;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
     ASSERT(p_length);
@@ -428,7 +428,7 @@ iERR _ion_reader_binary_get_value_length(ION_READER *preader, SIZE *p_length)
             // if the value was annotated we need to add in the distance between
             // the start of the annotation and the start of the value, since the
             // annotation is part of the value.
-            length += (SIZE)(binary->_value_start - binary->_annotation_start);
+            length += (ION_SIZE)(binary->_value_start - binary->_annotation_start);
         }
     }
     *p_length = length;
@@ -511,7 +511,7 @@ iERR _ion_reader_binary_has_annotation(ION_READER *preader, ION_STRING *annotati
     iENTER;
     ION_BINARY_READER    *binary;
     BOOL                  found = FALSE;
-    SID                  *psid, user_sid;
+    ION_SID                  *psid, user_sid;
     ION_COLLECTION_CURSOR cursor;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -559,7 +559,7 @@ iERR _ion_reader_binary_get_annotation_count(ION_READER *preader, int32_t *p_cou
     iRETURN;
 }
 
-iERR _ion_reader_binary_validate_symbol_token(ION_READER *preader, SID sid)
+iERR _ion_reader_binary_validate_symbol_token(ION_READER *preader, ION_SID sid)
 {
     iENTER;
     ION_SYMBOL_TABLE *symbol_table;
@@ -575,12 +575,12 @@ iERR _ion_reader_binary_validate_symbol_token(ION_READER *preader, SID sid)
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_an_annotation_sid(ION_READER *preader, int32_t idx, SID *p_sid)
+iERR _ion_reader_binary_get_an_annotation_sid(ION_READER *preader, int32_t idx, ION_SID *p_sid)
 {
     iENTER;
     ION_BINARY_READER    *binary;
     int                   ii;
-    SID                  *psid = NULL;
+    ION_SID                  *psid = NULL;
     ION_COLLECTION_CURSOR cursor;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -627,7 +627,7 @@ iERR _ion_reader_binary_string_copy_or_null(ION_READER *preader, ION_STRING *dst
 iERR _ion_reader_binary_get_an_annotation(ION_READER *preader, int32_t idx, ION_STRING *p_str)
 {
     iENTER;
-    SID               sid;
+    ION_SID               sid;
     ION_STRING       *pstr;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -646,7 +646,7 @@ iERR _ion_reader_binary_get_an_annotation(ION_READER *preader, int32_t idx, ION_
 iERR _ion_reader_binary_get_an_annotation_symbol(ION_READER *preader, int32_t idx, ION_SYMBOL *p_symbol)
 {
     iENTER;
-    SID               sid;
+    ION_SID               sid;
     ION_SYMBOL       *psymbol;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -672,13 +672,13 @@ iERR _ion_reader_binary_get_an_annotation_symbol(ION_READER *preader, int32_t id
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_annotations(ION_READER *preader, ION_STRING *p_annotations, SIZE max_count, SIZE *p_count)
+iERR _ion_reader_binary_get_annotations(ION_READER *preader, ION_STRING *p_annotations, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
     ION_BINARY_READER    *binary;
     ION_STRING           *pstr;
     int                   ii, count;
-    SID                  *psid;
+    ION_SID                  *psid;
     ION_COLLECTION_CURSOR cursor;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -712,13 +712,13 @@ return_value:
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_annotation_symbols(ION_READER *preader, ION_SYMBOL *p_annotations, SIZE max_count, SIZE *p_count)
+iERR _ion_reader_binary_get_annotation_symbols(ION_READER *preader, ION_SYMBOL *p_annotations, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
     ION_BINARY_READER    *binary;
     ION_SYMBOL           *pstr;
     int                   ii, count;
-    SID                  *psid;
+    ION_SID                  *psid;
     ION_COLLECTION_CURSOR cursor;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -781,7 +781,7 @@ iERR _ion_reader_binary_get_field_name(ION_READER *preader, ION_STRING **p_pstr)
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_field_sid(ION_READER *preader, SID *p_sid)
+iERR _ion_reader_binary_get_field_sid(ION_READER *preader, ION_SID *p_sid)
 {
     iENTER;
     ION_BINARY_READER *binary;
@@ -861,7 +861,7 @@ iERR _ion_reader_binary_is_null(ION_READER *preader, BOOL *p_is_null)
 // extends beyond it container. This is only checked when we have
 // a value in a container (struct, list, sexp). Typically this
 // occurs with invalid binary, or a seek to wrong position.
-iERR _ion_binary_reader_fits_container(ION_READER *preader, SIZE len)
+iERR _ion_binary_reader_fits_container(ION_READER *preader, ION_SIZE len)
 {
     iENTER;
     ION_BINARY_READER *binary;
@@ -1205,10 +1205,10 @@ iERR _ion_reader_binary_read_timestamp(ION_READER *preader, iTIMESTAMP p_value)
     iRETURN;
 }
 
-iERR _ion_reader_binary_read_symbol_sid_helper(ION_READER *preader, ION_BINARY_READER *binary, SID *p_value)
+iERR _ion_reader_binary_read_symbol_sid_helper(ION_READER *preader, ION_BINARY_READER *binary, ION_SID *p_value)
 {
     iENTER;
-    uint32_t           value;    // for the time being the SID is limited to 32 bits
+    uint32_t           value;    // for the time being the ION_SID is limited to 32 bits
 
     IONCHECK(_ion_binary_reader_fits_container(preader, binary->_value_len));
 
@@ -1216,11 +1216,11 @@ iERR _ion_reader_binary_read_symbol_sid_helper(ION_READER *preader, ION_BINARY_R
         FAILWITH(IERR_NUMERIC_OVERFLOW);
     }
     IONCHECK(ion_binary_read_uint_32(preader->istream, binary->_value_len, &value));
-    *p_value = (SID)value;
+    *p_value = (ION_SID)value;
     iRETURN;
 }
 
-iERR _ion_reader_binary_read_symbol_sid(ION_READER *preader, SID *p_value)
+iERR _ion_reader_binary_read_symbol_sid(ION_READER *preader, ION_SID *p_value)
 {
     iENTER;
     ION_BINARY_READER *binary;
@@ -1256,7 +1256,7 @@ iERR _ion_reader_binary_read_symbol_sid(ION_READER *preader, SID *p_value)
 iERR _ion_reader_binary_read_symbol(ION_READER *preader, ION_SYMBOL *p_symbol)
 {
     iENTER;
-    SID sid;
+    ION_SID sid;
     ION_SYMBOL *symbol;
 
     ASSERT(p_symbol);
@@ -1277,7 +1277,7 @@ iERR _ion_reader_binary_read_symbol(ION_READER *preader, ION_SYMBOL *p_symbol)
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_string_length(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_binary_get_string_length(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_BINARY_READER *binary;
@@ -1315,8 +1315,8 @@ iERR _ion_reader_binary_read_string(ION_READER *preader, ION_STRING *p_str)
     ION_BINARY_READER *binary;
     ION_STRING        *pstr;
     int                tid;
-    SIZE               str_len, bytes_read;
-    SID                sid;
+    ION_SIZE               str_len, bytes_read;
+    ION_SID                sid;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
     ASSERT(p_str != NULL);
@@ -1376,11 +1376,11 @@ iERR _ion_reader_binary_read_string(ION_READER *preader, ION_STRING *p_str)
 // accept_partial is *not* true and there isn't enough room in the passed in buffer.
 // if accept_partial is true it reads enough  bytes to fill the buffer or all 
 // bytes remaining in the string if the buffer is large enough
-iERR _ion_reader_binary_read_string_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length)
+iERR _ion_reader_binary_read_string_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length)
 {
     iENTER;
     ION_BINARY_READER *binary;
-    SIZE               length, read_len;
+    ION_SIZE               length, read_len;
     int                tid;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);
@@ -1432,7 +1432,7 @@ iERR _ion_reader_binary_read_string_bytes(ION_READER *preader, BOOL accept_parti
 
 // throws error if the buffer (buf) contains an invalid utf8 sequence
 // (I hate to do this, but it's for validation)
-iERR _ion_reader_binary_validate_utf8(BYTE *buf, SIZE len, SIZE expected_remaining, SIZE *p_expected_remaining)
+iERR _ion_reader_binary_validate_utf8(BYTE *buf, ION_SIZE len, ION_SIZE expected_remaining, ION_SIZE *p_expected_remaining)
 {
     iENTER;
     uint32_t c;
@@ -1515,7 +1515,7 @@ bad_utf8:
     iRETURN;
 }
 
-iERR _ion_reader_binary_get_lob_size(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_binary_get_lob_size(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_BINARY_READER *binary;
@@ -1543,11 +1543,11 @@ iERR _ion_reader_binary_get_lob_size(ION_READER *preader, SIZE *p_length)
 
     iRETURN;
 }
-iERR _ion_reader_binary_read_lob_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length)
+iERR _ion_reader_binary_read_lob_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length)
 {
     iENTER;
     ION_BINARY_READER *binary;
-    SIZE               length, read_len = 0;
+    ION_SIZE               length, read_len = 0;
     int                tid;
 
     ASSERT(preader && preader->type == ion_type_binary_reader);

@@ -109,7 +109,7 @@ GLOBAL int32_t g_ion_index_multiplier_x128 INITTO(2*128);
 // BOOL ion_index_is_empty(ION_INDEX *index)
 #define ION_INDEX_IS_EMPTY(index)       (ION_INDEX_SIZE(index) == 0)
 
-// SIZE count = ion_index_size(ION_INDEX *index)
+// ION_SIZE count = ion_index_size(ION_INDEX *index)
 #define ION_INDEX_SIZE(index)           ((index)->_count)
 
 typedef struct _ion_index_node *ION_INDEX_CURSOR;

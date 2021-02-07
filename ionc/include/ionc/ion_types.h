@@ -114,8 +114,8 @@ typedef struct ion_type    *ION_TYPE;
 #define tid_STRUCT_INT     0xD00
 #define tid_DATAGRAM_INT   0xF00
 
-typedef int32_t             SID;
-typedef int32_t             SIZE;
+typedef int32_t             ION_SID;
+typedef int32_t             ION_SIZE;
 typedef uint8_t             BYTE;
 typedef int                 BOOL;
 #define MAX_SIZE            INT32_MAX

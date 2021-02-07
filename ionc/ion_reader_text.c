@@ -103,7 +103,7 @@ iERR _ion_reader_text_open(ION_READER *preader)
     iRETURN;
 }
 
-iERR _ion_reader_text_open_alloc_buffered_string(ION_READER *preader, SIZE len, ION_STRING *p_string, BYTE **p_buf, SIZE *p_buf_len)
+iERR _ion_reader_text_open_alloc_buffered_string(ION_READER *preader, ION_SIZE len, ION_STRING *p_string, BYTE **p_buf, ION_SIZE *p_buf_len)
 {
     iENTER;
     BYTE *ptr;
@@ -297,7 +297,7 @@ iERR _ion_reader_text_next(ION_READER *preader, ION_TYPE *p_value_type)
     iRETURN;
 }
 
-iERR _ion_reader_text_intern_symbol(ION_READER *preader, ION_STRING *symbol_name, SID *local_sid, ION_SYMBOL **psym, BOOL parse_symbol_identifiers) {
+iERR _ion_reader_text_intern_symbol(ION_READER *preader, ION_STRING *symbol_name, ION_SID *local_sid, ION_SYMBOL **psym, BOOL parse_symbol_identifiers) {
     iENTER;
     ION_SYMBOL       *sym = NULL;
     ION_SYMBOL_TABLE *symbols;
@@ -323,7 +323,7 @@ iERR _ion_reader_text_load_fieldname(ION_READER *preader, ION_SUB_TYPE *p_ist)
     ION_SUB_TYPE     ist = IST_NONE;
     BOOL             eos_encountered = FALSE;
     ION_SYMBOL      *sym;
-    SID              local_sid;
+    ION_SID              local_sid;
 
     ASSERT(preader);
     ASSERT(text);
@@ -416,11 +416,11 @@ iERR _ion_reader_text_load_utas(ION_READER *preader, ION_SUB_TYPE *p_ist)
     ION_SUB_TYPE     ist = IST_NONE;
     ION_SYMBOL      *str;
     ION_SYMBOL      *sym;
-    SIZE             remaining;
+    ION_SIZE             remaining;
     BYTE            *next_dst;
     BOOL             is_double_colon;
     BOOL             eos_encountered = FALSE, is_system_value;
-    SID              local_sid;
+    ION_SID              local_sid;
 
     ASSERT(preader);
     ASSERT(text);
@@ -812,7 +812,7 @@ iERR _ion_reader_text_step_out(ION_READER *preader)
 
 
 
-iERR _ion_reader_text_get_depth(ION_READER *preader, SIZE *p_depth)
+iERR _ion_reader_text_get_depth(ION_READER *preader, ION_SIZE *p_depth)
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
@@ -907,7 +907,7 @@ iERR _ion_reader_text_has_annotation(ION_READER *preader, ION_STRING *annotation
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
     ION_SYMBOL       *str;
-    SIZE              count;
+    ION_SIZE              count;
     BOOL              found = FALSE;
 
     ASSERT(preader && preader->type == ion_type_text_reader);
@@ -1099,7 +1099,7 @@ iERR _ion_reader_text_get_symbol_table(ION_READER *preader, ION_SYMBOL_TABLE **p
 }
 
 
-iERR _ion_reader_text_get_field_sid(ION_READER *preader, SID *p_sid)
+iERR _ion_reader_text_get_field_sid(ION_READER *preader, ION_SID *p_sid)
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
@@ -1116,7 +1116,7 @@ iERR _ion_reader_text_get_field_sid(ION_READER *preader, SID *p_sid)
     iRETURN;
 }
 
-iERR _ion_reader_text_get_annotation_symbols(ION_READER *preader, ION_SYMBOL *p_symbols, SIZE max_count, SIZE *p_count)
+iERR _ion_reader_text_get_annotation_symbols(ION_READER *preader, ION_SYMBOL *p_symbols, ION_SIZE max_count, ION_SIZE *p_count)
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
@@ -1180,11 +1180,11 @@ iERR _ion_reader_text_get_value_offset(ION_READER *preader, POSITION *p_offset)
     iRETURN;
 }
 
-iERR _ion_reader_text_get_value_length(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_text_get_value_length(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
-    SIZE              length;
+    ION_SIZE              length;
 
     ASSERT(preader && preader->type == ion_type_text_reader);
     ASSERT(p_length);
@@ -1265,7 +1265,7 @@ iERR _ion_reader_text_read_mixed_int_helper(ION_READER *preader)
 {
     iENTER;
     ION_TEXT_READER *text = &preader->typed_reader.text;
-    SIZE             len;
+    ION_SIZE             len;
 
     ASSERT(preader);
 
@@ -1531,7 +1531,7 @@ iERR _ion_reader_text_read_timestamp(ION_READER *preader, ION_TIMESTAMP *p_value
 {
     iENTER;
     ION_TEXT_READER *text = &preader->typed_reader.text;
-    SIZE             used;
+    ION_SIZE             used;
 
     ASSERT(preader);
     ASSERT(p_value);
@@ -1569,7 +1569,7 @@ iERR _ion_reader_text_read_symbol(ION_READER *preader, ION_SYMBOL *p_symbol)
     ION_TEXT_READER  *text = &preader->typed_reader.text;
     ION_STRING       *user_str = &text->_scanner._value_image;
     ION_SYMBOL       *sym;
-    SID               local_sid;
+    ION_SID               local_sid;
 
     ASSERT(preader);
     ASSERT(p_symbol);
@@ -1588,7 +1588,7 @@ iERR _ion_reader_text_read_symbol(ION_READER *preader, ION_SYMBOL *p_symbol)
     IONCHECK(_ion_reader_text_intern_symbol(preader, user_str, &local_sid, &sym, text->_value_sub_type != IST_SYMBOL_QUOTED));
     if (sym) {
         IONCHECK(_ion_reader_text_validate_symbol_token(preader, sym));
-        // This was a symbol identifier, e.g. $10. The user should be presented with the symbol text, not the SID.
+        // This was a symbol identifier, e.g. $10. The user should be presented with the symbol text, not the ION_SID.
         ASSERT(sym->sid > UNKNOWN_SID); // Success to this point means the symbol is defined.
         ION_STRING_ASSIGN(&p_symbol->value, &sym->value);
         ION_STRING_ASSIGN(&p_symbol->import_location.name, &sym->import_location.name);
@@ -1605,7 +1605,7 @@ iERR _ion_reader_text_read_symbol(ION_READER *preader, ION_SYMBOL *p_symbol)
     iRETURN;
 }
 
-iERR _ion_reader_text_get_string_length(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_text_get_string_length(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_TEXT_READER *text = &preader->typed_reader.text;
@@ -1677,7 +1677,7 @@ iERR _ion_reader_text_read_string(ION_READER *preader, ION_STRING *p_user_str)
     if (text->_value_sub_type->base_type == tid_SYMBOL) {
         IONCHECK(_ion_reader_text_intern_symbol(preader, user_str, NULL, &sym, text->_value_sub_type != IST_SYMBOL_QUOTED));
         if (sym) {
-            // This was a symbol identifier, e.g. $10. The user should be presented with the symbol text, not the SID.
+            // This was a symbol identifier, e.g. $10. The user should be presented with the symbol text, not the ION_SID.
             ASSERT(sym->sid > UNKNOWN_SID); // Success to this point means the symbol is defined.
             IONCHECK(_ion_reader_text_validate_symbol_token(preader, sym));
             ION_STRING_ASSIGN(p_user_str, &sym->value);
@@ -1727,11 +1727,11 @@ iERR _ion_reader_text_load_string_in_value_buffer(ION_READER *preader)
     iRETURN;
 }       
 
-iERR _ion_reader_text_read_string_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) 
+iERR _ion_reader_text_read_string_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) 
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
-    SIZE              written, remaining;
+    ION_SIZE              written, remaining;
     BOOL              eos_encountered;
 
     ASSERT(preader);
@@ -1797,7 +1797,7 @@ iERR _ion_reader_text_read_string_bytes(ION_READER *preader, BOOL accept_partial
     iRETURN;
 }       
 
-iERR _ion_reader_text_get_lob_size(ION_READER *preader, SIZE *p_length)
+iERR _ion_reader_text_get_lob_size(ION_READER *preader, ION_SIZE *p_length)
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
@@ -1859,11 +1859,11 @@ iERR _ion_reader_text_get_lob_size(ION_READER *preader, SIZE *p_length)
     iRETURN;
 }
 
-iERR _ion_reader_text_read_lob_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, SIZE buf_max, SIZE *p_length) 
+iERR _ion_reader_text_read_lob_bytes(ION_READER *preader, BOOL accept_partial, BYTE *p_buf, ION_SIZE buf_max, ION_SIZE *p_length) 
 {
     iENTER;
     ION_TEXT_READER  *text = &preader->typed_reader.text;
-    SIZE              written, remaining;
+    ION_SIZE              written, remaining;
     BOOL              eos_encountered = FALSE;
 
     ASSERT(preader);

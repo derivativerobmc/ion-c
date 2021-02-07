@@ -46,7 +46,7 @@ typedef struct _ion_writer_options
     /** Sets the default indent amount (default is 2)
      *
      */
-    SIZE indent_size;
+    ION_SIZE indent_size;
 
     /** Puts "small" containers on a single line instead of putting all values on separate lines
      *
@@ -66,21 +66,21 @@ typedef struct _ion_writer_options
     /** The max container depth defaults to 10
      *
      */
-    SIZE max_container_depth;
+    ION_SIZE max_container_depth;
 
     /** The max number of annotations on 1 value, defaults to 10
      */
-    SIZE max_annotation_count;
+    ION_SIZE max_annotation_count;
 
     /** The temp buffer is used to hold temp strings (etc) default is 1024
      *
      */
-    SIZE temp_buffer_size;
+    ION_SIZE temp_buffer_size;
 
     /** memory is allocated in pages owned by the primary entities it's default size is 4096
      *
      */
-    SIZE allocation_page_size;
+    ION_SIZE allocation_page_size;
 
     /** Handle to catalog of shared symbol tables for the writer to use
      *
@@ -128,7 +128,7 @@ ION_API_EXPORT iERR ion_writer_options_add_shared_imports(ION_WRITER_OPTIONS *op
  * `ion_writer_options_initialize_shared_imports` must have been called first. The given array must not contain
  * a system symbol table.
  */
-ION_API_EXPORT iERR ion_writer_options_add_shared_imports_symbol_tables(ION_WRITER_OPTIONS *options, ION_SYMBOL_TABLE **imports, SIZE imports_count);
+ION_API_EXPORT iERR ion_writer_options_add_shared_imports_symbol_tables(ION_WRITER_OPTIONS *options, ION_SYMBOL_TABLE **imports, ION_SIZE imports_count);
 
 /**
  * Frees the options' imports list. This must be done once the options are no longer needed, and only if
@@ -146,7 +146,7 @@ ION_API_EXPORT iERR ion_writer_options_close_shared_imports(ION_WRITER_OPTIONS *
  */
 ION_API_EXPORT iERR ion_writer_open_buffer          (hWRITER *p_hwriter
                                                     ,BYTE *buffer
-                                                    ,SIZE buf_length
+                                                    ,ION_SIZE buf_length
                                                     ,ION_WRITER_OPTIONS *p_options);
 
 
@@ -168,7 +168,7 @@ ION_API_EXPORT iERR ion_writer_open                 (hWRITER *p_hwriter
                                                     ,ION_STREAM *p_stream
                                                     ,ION_WRITER_OPTIONS *p_options);
 
-ION_API_EXPORT iERR ion_writer_get_depth            (hWRITER hwriter, SIZE *p_depth);
+ION_API_EXPORT iERR ion_writer_get_depth            (hWRITER hwriter, ION_SIZE *p_depth);
 
 ION_API_EXPORT iERR ion_writer_set_catalog          (hWRITER hwriter, hCATALOG    hcatalog);
 ION_API_EXPORT iERR ion_writer_get_catalog          (hWRITER hwriter, hCATALOG *p_hcatalog);
@@ -217,8 +217,8 @@ ION_API_EXPORT iERR ion_writer_write_field_name_symbol(hWRITER hwriter, ION_SYMB
 ION_API_EXPORT iERR ion_writer_clear_field_name     (hWRITER hwriter);
 ION_API_EXPORT iERR ion_writer_add_annotation       (hWRITER hwriter, iSTRING annotation);
 ION_API_EXPORT iERR ion_writer_add_annotation_symbol(hWRITER hwriter, ION_SYMBOL *annotation);
-ION_API_EXPORT iERR ion_writer_write_annotations    (hWRITER hwriter, iSTRING p_annotations, SIZE count);
-ION_API_EXPORT iERR ion_writer_write_annotation_symbols(hWRITER hwriter, ION_SYMBOL *annotations, SIZE count);
+ION_API_EXPORT iERR ion_writer_write_annotations    (hWRITER hwriter, iSTRING p_annotations, ION_SIZE count);
+ION_API_EXPORT iERR ion_writer_write_annotation_symbols(hWRITER hwriter, ION_SYMBOL *annotations, ION_SIZE count);
 ION_API_EXPORT iERR ion_writer_clear_annotations    (hWRITER hwriter);
 
 ION_API_EXPORT iERR ion_writer_write_null           (hWRITER hwriter);
@@ -240,11 +240,11 @@ ION_API_EXPORT iERR ion_writer_write_timestamp      (hWRITER hwriter, iTIMESTAMP
 ION_API_EXPORT iERR ion_writer_write_symbol         (hWRITER hwriter, iSTRING p_value);
 ION_API_EXPORT iERR ion_writer_write_ion_symbol     (hWRITER hwriter, ION_SYMBOL *symbol);
 ION_API_EXPORT iERR ion_writer_write_string         (hWRITER hwriter, iSTRING p_value);
-ION_API_EXPORT iERR ion_writer_write_clob           (hWRITER hwriter, BYTE *p_buf, SIZE length);
-ION_API_EXPORT iERR ion_writer_write_blob           (hWRITER hwriter, BYTE *p_buf, SIZE length);
+ION_API_EXPORT iERR ion_writer_write_clob           (hWRITER hwriter, BYTE *p_buf, ION_SIZE length);
+ION_API_EXPORT iERR ion_writer_write_blob           (hWRITER hwriter, BYTE *p_buf, ION_SIZE length);
 
 ION_API_EXPORT iERR ion_writer_start_lob            (hWRITER hwriter, ION_TYPE lob_type);
-ION_API_EXPORT iERR ion_writer_append_lob           (hWRITER hwriter, BYTE *p_buf, SIZE length);
+ION_API_EXPORT iERR ion_writer_append_lob           (hWRITER hwriter, BYTE *p_buf, ION_SIZE length);
 ION_API_EXPORT iERR ion_writer_finish_lob           (hWRITER hwriter);
 ION_API_EXPORT iERR ion_writer_start_container      (hWRITER hwriter, ION_TYPE container_type);
 ION_API_EXPORT iERR ion_writer_finish_container     (hWRITER hwriter);
@@ -258,7 +258,7 @@ ION_API_EXPORT iERR ion_writer_write_all_values     (hWRITER hwriter, hREADER hr
  * any writer is an error.
  * @param   p_bytes_flushed - the number of bytes written into the buffer/stream.
  */
-ION_API_EXPORT iERR ion_writer_flush                (hWRITER hwriter, SIZE *p_bytes_flushed);
+ION_API_EXPORT iERR ion_writer_flush                (hWRITER hwriter, ION_SIZE *p_bytes_flushed);
 
 /**
  * Flushes pending bytes, ending the current symbol table context and forcing an Ion Version Marker if the writer
@@ -266,7 +266,7 @@ ION_API_EXPORT iERR ion_writer_flush                (hWRITER hwriter, SIZE *p_by
  * If any value is in-progress, finishing any writer is an error.
  * @param   p_bytes_flushed - the number of bytes written into the buffer/stream.
  */
-ION_API_EXPORT iERR ion_writer_finish               (hWRITER hwriter, SIZE *p_bytes_flushed);
+ION_API_EXPORT iERR ion_writer_finish               (hWRITER hwriter, ION_SIZE *p_bytes_flushed);
 
 /**
  * Finishes the writer, frees the writer's associated resources, and finally frees the writer itself. The writer may

@@ -45,7 +45,7 @@
 iERR ion_extractor_open(hEXTRACTOR *extractor, ION_EXTRACTOR_OPTIONS *options) {
     iENTER;
     ION_EXTRACTOR *pextractor = NULL;
-    SIZE len;
+    ION_SIZE len;
     ASSERT(extractor);
 
     if (options) {
@@ -188,7 +188,7 @@ iERR ion_extractor_path_append_wildcard(ION_EXTRACTOR_PATH_DESCRIPTOR *path) {
 }
 
 iERR ion_extractor_path_create_from_ion(ION_EXTRACTOR *extractor, ION_EXTRACTOR_CALLBACK callback,
-                                        void *user_context, BYTE *ion_data, SIZE ion_data_length,
+                                        void *user_context, BYTE *ion_data, ION_SIZE ion_data_length,
                                         ION_EXTRACTOR_PATH_DESCRIPTOR **p_path) {
     iENTER;
     ION_READER *reader = NULL;
@@ -346,7 +346,7 @@ iERR _ion_extractor_dispatch_match(ION_EXTRACTOR *extractor, ION_READER *reader,
                                    ION_EXTRACTOR_CONTROL *control) {
     iENTER;
     ION_EXTRACTOR_MATCHER *matcher;
-    SIZE old_depth, new_depth;
+    ION_SIZE old_depth, new_depth;
 
     matcher = &extractor->_matchers[matcher_index];
     IONCHECK(ion_reader_get_depth(reader, &old_depth));
@@ -359,7 +359,7 @@ iERR _ion_extractor_dispatch_match(ION_EXTRACTOR *extractor, ION_READER *reader,
     iRETURN;
 }
 
-iERR _ion_extractor_evaluate_predicates(ION_EXTRACTOR *extractor, ION_READER *reader, SIZE depth, POSITION ordinal,
+iERR _ion_extractor_evaluate_predicates(ION_EXTRACTOR *extractor, ION_READER *reader, ION_SIZE depth, POSITION ordinal,
                                         ION_EXTRACTOR_CONTROL *control,
                                         ION_EXTRACTOR_ACTIVE_PATH_MAP previous_depth_actives,
                                         ION_EXTRACTOR_ACTIVE_PATH_MAP *current_depth_actives) {
@@ -409,7 +409,7 @@ iERR _ion_extractor_evaluate_predicates(ION_EXTRACTOR *extractor, ION_READER *re
     iRETURN;
 }
 
-iERR _ion_extractor_match_helper(hEXTRACTOR extractor, ION_READER *reader, SIZE depth,
+iERR _ion_extractor_match_helper(hEXTRACTOR extractor, ION_READER *reader, ION_SIZE depth,
                                  ION_EXTRACTOR_ACTIVE_PATH_MAP previous_depth_actives,
                                  ION_EXTRACTOR_CONTROL *control) {
     iENTER;
@@ -470,7 +470,7 @@ iERR _ion_extractor_match_helper(hEXTRACTOR extractor, ION_READER *reader, SIZE 
 
 iERR ion_extractor_match(ION_EXTRACTOR *extractor, ION_READER *reader) {
     iENTER;
-    SIZE depth;
+    ION_SIZE depth;
     ION_EXTRACTOR_CONTROL control = ion_extractor_control_next();
 
     ASSERT(extractor);

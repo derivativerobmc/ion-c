@@ -822,7 +822,7 @@ iERR _ion_scanner_read_null_type(ION_SCANNER *scanner, ION_SUB_TYPE *p_ist)
     iENTER;
     int           c;
     char          unread_buffer[MAX_TYPE_NAME_LEN + 1], *unread_pos = unread_buffer;  // +1 for null terminator
-    SIZE          len, remaining = MAX_TYPE_NAME_LEN + 1;
+    ION_SIZE          len, remaining = MAX_TYPE_NAME_LEN + 1;
     ION_SUB_TYPE  ist;
     BOOL          is_terminator;
 
@@ -1389,7 +1389,7 @@ just_another_char: // yes this is evil
     iRETURN;
 }
 
-iERR _ion_scanner_read_cached_bytes(ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written)
+iERR _ion_scanner_read_cached_bytes(ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written)
 {
     iENTER;
     BYTE *pb = buf, *sb = scanner->_pending_bytes_pos;
@@ -1416,14 +1416,14 @@ iERR _ion_scanner_read_cached_bytes(ION_SCANNER *scanner, BYTE *buf, SIZE len, S
 
 iERR _ion_scanner_read_as_string(ION_SCANNER *scanner
                                , BYTE        *buf
-                               , SIZE         len
+                               , ION_SIZE         len
                                , ION_SUB_TYPE ist
-                               , SIZE        *p_bytes_written
+                               , ION_SIZE        *p_bytes_written
                                , BOOL        *p_eos_encountered
 ) {
     iENTER;
     BYTE       *dst = buf;
-    SIZE        remaining = len, written;
+    ION_SIZE        remaining = len, written;
     BOOL        triple_quote_found, eos_encountered = FALSE;
 
     ASSERT(scanner);
@@ -1496,13 +1496,13 @@ iERR _ion_scanner_read_as_string(ION_SCANNER *scanner
     iRETURN;
 }
 
-iERR _ion_scanner_read_as_string_to_quote(ION_SCANNER *scanner, BYTE *buf, SIZE len, ION_SUB_TYPE ist, SIZE *p_bytes_written, BOOL *p_eos_encountered)
+iERR _ion_scanner_read_as_string_to_quote(ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SUB_TYPE ist, ION_SIZE *p_bytes_written, BOOL *p_eos_encountered)
 {
     iENTER;
     ION_STREAM *stream = scanner->_stream;
     BOOL        is_triple_quote, triple_quote_terminator = FALSE, eos_encountered = FALSE;
     BYTE       *dst = buf;
-    SIZE        remaining = len, written;
+    ION_SIZE        remaining = len, written;
     int         c, c2;
 
     ASSERT(scanner);
@@ -1648,11 +1648,11 @@ end_of_string:
     iRETURN;
 }
 
-iERR _ion_scanner_read_as_symbol(ION_SCANNER *scanner, BYTE *dst, SIZE len, SIZE *p_bytes_written)
+iERR _ion_scanner_read_as_symbol(ION_SCANNER *scanner, BYTE *dst, ION_SIZE len, ION_SIZE *p_bytes_written)
 {
     iENTER;
     ION_STREAM *stream = scanner->_stream;
-    SIZE        remaining = len;
+    ION_SIZE        remaining = len;
     int         c;
 
     ASSERT(scanner);
@@ -1695,11 +1695,11 @@ end_of_symbol:
     iRETURN;
 }
 
-iERR _ion_scanner_read_as_extended_symbol(ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written)
+iERR _ion_scanner_read_as_extended_symbol(ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written)
 {
     iENTER;
     BYTE       *dst = buf;
-    SIZE        remaining = len;
+    ION_SIZE        remaining = len;
     int         c;
 
     ASSERT(scanner);
@@ -1738,11 +1738,11 @@ end_of_symbol:
 
 // for non-ascii characters this converts to utf8 and writes them out
 // this also handles the special forms of new line
-iERR _ion_scanner_encode_utf8_char(ION_SCANNER *scanner, int c, BYTE *buf, SIZE remaining, SIZE *p_bytes_written)
+iERR _ion_scanner_encode_utf8_char(ION_SCANNER *scanner, int c, BYTE *buf, ION_SIZE remaining, ION_SIZE *p_bytes_written)
 {
     iENTER;
     BYTE *pb = buf;
-    SIZE  written = 0;
+    ION_SIZE  written = 0;
 
     // if there isn't enough room in the caller buffer we temporarily write
     // into the scanners small byte buffer, we can read the rest out of there later
@@ -1991,12 +1991,12 @@ iERR _ion_scanner_read_lob_closing_braces(ION_SCANNER *scanner)
     iRETURN;
 }
 
-iERR _ion_scanner_read_as_base64(ION_SCANNER *scanner, BYTE *buf, SIZE len, SIZE *p_bytes_written, BOOL *p_eos_encountered)
+iERR _ion_scanner_read_as_base64(ION_SCANNER *scanner, BYTE *buf, ION_SIZE len, ION_SIZE *p_bytes_written, BOOL *p_eos_encountered)
 {
     iENTER;
     BOOL        eos_encountered = FALSE;
     BYTE       *dst = buf;
-    SIZE        remaining = len, written, output_length;
+    ION_SIZE        remaining = len, written, output_length;
     int         c, b64_value, b64_block;
     int         padding = 0;
 
@@ -2143,7 +2143,7 @@ iERR _ion_scanner_read_possible_number(ION_SCANNER *scanner, int c, int sign, IO
     iENTER;
     ION_SUB_TYPE    t = IST_NONE;
     BYTE           *dst = scanner->_value_buffer;
-    SIZE            remaining_before, remaining = scanner->_value_buffer_length;
+    ION_SIZE            remaining_before, remaining = scanner->_value_buffer_length;
     BOOL            is_zero;
 
     ASSERT(isdigit(c));
@@ -2262,7 +2262,7 @@ iERR _ion_scanner_read_possible_number(ION_SCANNER *scanner, int c, int sign, IO
     iRETURN;
 }
 
-iERR _ion_scanner_read_radix_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char, ION_INT_RADIX radix, BOOL underscore_allowed)
+iERR _ion_scanner_read_radix_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char, ION_INT_RADIX radix, BOOL underscore_allowed)
 {
     iENTER;
     int   c, remaining = *p_remaining;
@@ -2298,7 +2298,7 @@ iERR _ion_scanner_read_radix_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_rem
     iRETURN;
 }
 
-iERR _ion_scanner_read_hex_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining)
+iERR _ion_scanner_read_hex_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining)
 {
     iENTER;
     int c;
@@ -2307,7 +2307,7 @@ iERR _ion_scanner_read_hex_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remai
     iRETURN;
 }
 
-iERR _ion_scanner_read_binary_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining)
+iERR _ion_scanner_read_binary_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining)
 {
     iENTER;
     int c;
@@ -2316,11 +2316,11 @@ iERR _ion_scanner_read_binary_int(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_re
     iRETURN;
 }
 
-iERR _ion_scanner_read_digits(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char)
+iERR _ion_scanner_read_digits(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char)
 {
     iENTER;
     BYTE *dst      = *p_dst;
-    SIZE remaining = *p_remaining;
+    ION_SIZE remaining = *p_remaining;
     int  c;
 
     for (;;) {
@@ -2338,18 +2338,18 @@ iERR _ion_scanner_read_digits(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remain
     iRETURN;
 }
 
-iERR _ion_scanner_read_digits_with_underscores(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char, BOOL underscore_allowed)
+iERR _ion_scanner_read_digits_with_underscores(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char, BOOL underscore_allowed)
 {
     iENTER;
     IONCHECK(_ion_scanner_read_radix_int(scanner, p_dst, p_remaining, p_char, ION_INT_DECIMAL, underscore_allowed));
     iRETURN;
 }
 
-iERR _ion_scanner_read_exponent(ION_SCANNER *scanner, BYTE **p_dst, SIZE *p_remaining, int *p_char)
+iERR _ion_scanner_read_exponent(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_char)
 {
     iENTER;
     BYTE *dst      = *p_dst;
-    SIZE remaining = *p_remaining;
+    ION_SIZE remaining = *p_remaining;
     int  c;
 
     // the first char following the 'e' ('d' or other) is either a sign or a digit
@@ -2375,13 +2375,13 @@ past_exponent:
     iRETURN;
 }
 
-iERR _ion_scanner_read_timestamp(ION_SCANNER *scanner, int c, BYTE **p_dst, SIZE *p_remaining, ION_SUB_TYPE *p_ist )
+iERR _ion_scanner_read_timestamp(ION_SCANNER *scanner, int c, BYTE **p_dst, ION_SIZE *p_remaining, ION_SUB_TYPE *p_ist )
 {
     iENTER;
     ION_SUB_TYPE t                      = IST_TIMESTAMP_YEAR;
     BYTE        *dst                    = *p_dst;
-    SIZE         remaining              = *p_remaining;
-    SIZE         remaining_before;
+    ION_SIZE         remaining              = *p_remaining;
+    ION_SIZE         remaining_before;
     BOOL         valid_termination_char = FALSE;
     BOOL         has_time               = FALSE;
 

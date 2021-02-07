@@ -22,7 +22,7 @@
 #include "ion_internal.h"
 #include <string.h>
 
-BOOL ion_helper_is_ion_version_marker(BYTE *buffer, SIZE len) 
+BOOL ion_helper_is_ion_version_marker(BYTE *buffer, ION_SIZE len) 
 {
     BOOL is_ion_version_marker = 
             len       >= ION_VERSION_MARKER_LENGTH
@@ -258,7 +258,7 @@ const char *_ion_hack_bad_value_to_str(intptr_t val, char *msg)
 {
     char   hack_buffer_int[MAX_INT32_LENGTH];
     char  *hack_buffer_return, *hack_buffer;
-    SIZE int_len, msg_limit;
+    ION_SIZE int_len, msg_limit;
 
     ASSERT(sizeof(val) == sizeof(int));
 
@@ -288,7 +288,7 @@ const char *_ion_hack_bad_value_to_str(intptr_t val, char *msg)
     return hack_buffer_return;
 }
 
-char * _ion_itoa_10(int32_t val, char *dst_buf, SIZE buf_length) 
+char * _ion_itoa_10(int32_t val, char *dst_buf, ION_SIZE buf_length) 
 {
     // sprintf(dest, "%d", val); - with sprintf we can't tell if we're running off the end of the buf
 
@@ -340,7 +340,7 @@ overflow:
     return NULL; // this should force a null pointer exception in the caller
 }
 
-char *_ion_i64toa_10(int64_t val, char *dst_buf, SIZE buf_length) 
+char *_ion_i64toa_10(int64_t val, char *dst_buf, ION_SIZE buf_length) 
 {
     // sprintf(dest, "%dI64", val); - with sprintf we can't tell if we're running off the end of the buf
 
@@ -395,11 +395,11 @@ overflow:
     return NULL; // this should force a null pointer exception in the caller
 }
 
-SIZE _ion_strnlen(const char *str, const SIZE maxlen) {
+ION_SIZE _ion_strnlen(const char *str, const ION_SIZE maxlen) {
     const char *pos = (const char *)memchr(str, '\0', maxlen);
-    SIZE len = maxlen;
+    ION_SIZE len = maxlen;
     if (pos) {
-        len = (SIZE)(pos - str);  // save since maxlen passed to memchr limits this to SIZE
+        len = (ION_SIZE)(pos - str);  // save since maxlen passed to memchr limits this to ION_SIZE
     }
     else {
         len = -1;
