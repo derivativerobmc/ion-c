@@ -63,7 +63,7 @@ TEST(IonTextTimestamp, WriterIgnoresSuperfluousOffset) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_TIMESTAMP timestamp;
 
     ION_ASSERT_OK(ion_timestamp_for_year(&timestamp, 1));
@@ -81,7 +81,7 @@ TEST(IonTextSymbol, WriterWritesSymbolValueZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -98,7 +98,7 @@ TEST(IonTextSymbol, WriterWritesSymbolAnnotationZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -121,7 +121,7 @@ TEST(IonTextSymbol, WriterWritesSymbolFieldNameZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -177,10 +177,10 @@ TEST(IonTextSymbol, ReaderReadsAnnotationSymbolZero) {
     const char *ion_text = "'$0'::$0 $0::'$0'";
     hREADER reader;
     ION_TYPE type;
-    SID symbol_value;
+    ION_SID symbol_value;
     ION_SYMBOL annotations[1];
     ION_STRING annotation_strs[1];
-    SIZE num_annotations;
+    ION_SIZE num_annotations;
     ION_SYMBOL symbol;
 
     ION_ASSERT_OK(ion_test_new_text_reader(ion_text, &reader));
@@ -211,12 +211,12 @@ TEST(IonTextSymbol, ReaderReadsFieldNameSymbolZero) {
     const char *ion_text = "{'$0':'$0'::$0, $0:$0::'$0', $0:'$0'::$0}";
     hREADER reader;
     ION_TYPE type;
-    SID symbol_value;
+    ION_SID symbol_value;
     ION_SYMBOL *field_name;
     ION_STRING field_name_str;
     ION_SYMBOL annotation_symbols[1];
     ION_STRING annotations[1];
-    SIZE num_annotations;
+    ION_SIZE num_annotations;
     ION_STRING symbol_text;
 
     ION_ASSERT_OK(ion_test_new_text_reader(ion_text, &reader));
@@ -262,7 +262,7 @@ TEST(IonTextSymbol, ReaderReadsFieldNameSymbolZero) {
     ION_ASSERT_OK(ion_reader_close(reader));
 }
 
-void ion_test_write_all_values(hREADER reader, BYTE **result, SIZE *result_len, BOOL to_binary) {
+void ion_test_write_all_values(hREADER reader, BYTE **result, ION_SIZE *result_len, BOOL to_binary) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
 
@@ -274,14 +274,14 @@ void ion_test_write_all_values(hREADER reader, BYTE **result, SIZE *result_len, 
     ION_ASSERT_OK(ion_test_writer_get_bytes(writer, ion_stream, result, result_len));
 }
 
-void ion_test_write_all_values_from_text(const char *ion_text, BYTE **result, SIZE *result_len, BOOL to_binary) {
+void ion_test_write_all_values_from_text(const char *ion_text, BYTE **result, ION_SIZE *result_len, BOOL to_binary) {
     hREADER reader;
 
     ION_ASSERT_OK(ion_test_new_text_reader(ion_text, &reader));
     ion_test_write_all_values(reader, result, result_len, to_binary);
 }
 
-void ion_test_write_all_values_from_binary(BYTE *ion_data, SIZE ion_data_len, BYTE **result, SIZE *result_len, BOOL to_binary) {
+void ion_test_write_all_values_from_binary(BYTE *ion_data, ION_SIZE ion_data_len, BYTE **result, ION_SIZE *result_len, BOOL to_binary) {
     hREADER reader;
 
     ION_ASSERT_OK(ion_reader_open_buffer(&reader, ion_data, ion_data_len, NULL));
@@ -291,10 +291,10 @@ void ion_test_write_all_values_from_binary(BYTE *ion_data, SIZE ion_data_len, BY
 TEST(IonTextSymbol, WriterWriteAllValuesPreservesSymbolZero) {
     const char *ion_text = "{'$0':'$0'::$0,$0:$0::'$0',$0:'$0'::$0}";
     const BYTE *ion_binary = (BYTE *)"\xDE\x90\x8A\xE3\x81\x8A\x70\x80\xE4\x81\x80\x71\x0A\x80\xE3\x81\x8A\x70";
-    const SIZE ion_binary_size = 18;
+    const ION_SIZE ion_binary_size = 18;
 
     BYTE *result = NULL;
-    SIZE result_len;
+    ION_SIZE result_len;
 
     ion_test_write_all_values_from_text(ion_text, &result, &result_len, FALSE);
     assertStringsEqual(ion_text, (char *)result, result_len);
@@ -314,7 +314,7 @@ TEST(IonTextSymbol, WriterWritesSymbolValueIVMTextAsNoOp) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING ivm_text;
 
     ION_ASSERT_OK(ion_string_from_cstr("$ion_1_0", &ivm_text));
@@ -355,7 +355,7 @@ TEST(IonTextSymbol, ReaderReadsSymbolValueTrueIVM) {
     const char *ion_text = "$ion_symbol_table::{symbols:[\"foo\"]} $ion_1_0 $10";
     hREADER reader;
     ION_TYPE type;
-    SID sid;
+    ION_SID sid;
 
     ION_ASSERT_OK(ion_test_new_text_reader(ion_text, &reader));
     ION_ASSERT_OK(ion_reader_next(reader, &type));
@@ -370,7 +370,7 @@ TEST(IonTextSymbol, ReaderReadsSymbolValueAnnotatedIVM) {
     const char *ion_text = "$ion_symbol_table::{symbols:[\"foo\"]} annotated::$ion_1_0 $10";
     hREADER reader;
     ION_TYPE type;
-    SIZE annot_count;
+    ION_SIZE annot_count;
     ION_STRING annot, result;
     ION_SYMBOL symbol;
 
@@ -414,7 +414,7 @@ TEST(IonTextSymbol, WriterWritesKeywordsAsQuotedSymbols) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING str_false, str_true, str_nan;
     ion_string_from_cstr("false", &str_false);
     ion_string_from_cstr("true", &str_true);
@@ -432,13 +432,13 @@ TEST(IonTextSymbol, WriterWritesKeywordsAsQuotedSymbols) {
 
 TEST(IonTextSymbol, ReaderChoosesLowestSIDForDuplicateSymbol) {
     // Asserts that the reader and symbol table work together to make sure by-name symbol queries return the lowest
-    // possible SID for symbols declared multiple times. At the same time, all by-ID queries should return the correct
+    // possible ION_SID for symbols declared multiple times. At the same time, all by-ID queries should return the correct
     // text.
     const char *ion_text = "$ion_symbol_table::{symbols:[\"name\"]} name $10";
     hREADER reader;
     ION_TYPE type;
     ION_STRING result, *lookup;
-    SID sid;
+    ION_SID sid;
     ION_SYMBOL_TABLE *symbol_table;
     ION_SYMBOL symbol;
 
@@ -452,7 +452,7 @@ TEST(IonTextSymbol, ReaderChoosesLowestSIDForDuplicateSymbol) {
     ION_ASSERT_OK(ion_reader_read_string(reader, &result));
     assertStringsEqual("name", (char *)result.value, result.length);
     ION_ASSERT_OK(ion_test_reader_read_symbol_sid(reader, &sid));
-    ASSERT_EQ(10, sid); // SID 10 was explicitly declared.
+    ASSERT_EQ(10, sid); // ION_SID 10 was explicitly declared.
 
     ION_ASSERT_OK(ion_reader_get_symbol_table(reader, &symbol_table));
     ION_ASSERT_OK(ion_symbol_table_find_by_name(symbol_table, &result, &sid));
@@ -468,10 +468,10 @@ TEST(IonTextSymbol, ReaderChoosesLowestSIDForDuplicateSymbol) {
 TEST(IonTextSymbol, WriterWriteAllValuesPreservesSymbolKeywords) {
     const char *ion_text = "{'false':'true'::'nan'}";
     const BYTE *ion_binary = (BYTE *)"\xD6\x8B\xE4\x81\x8C\x71\x0A";
-    const SIZE ion_binary_size = 7;
+    const ION_SIZE ion_binary_size = 7;
 
     BYTE *result = NULL;
-    SIZE result_len;
+    ION_SIZE result_len;
 
     ion_test_write_all_values_from_text(ion_text, &result, &result_len, FALSE);
     assertStringsEqual(ion_text, (char *)result, result_len);
@@ -501,9 +501,9 @@ TEST(IonTextSymbol, ReaderReadsUndefinedSymbol) {
                     "$85";
     // Symbol 53 is a dummy symbol (unknown text), but is valid because it is within the max ID range of the
     // not-found import. Symbol 85 is the first local symbol ("rock").
-    // 9 (+1 for SID 0) = 10 system symbols + 75 imports = 85.
+    // 9 (+1 for ION_SID 0) = 10 system symbols + 75 imports = 85.
     hREADER reader;
-    SID sid;
+    ION_SID sid;
     hSYMTAB symtab;
     ION_STRING *symbol;
     ION_TYPE type;

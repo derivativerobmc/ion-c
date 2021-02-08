@@ -124,7 +124,7 @@ size_t ion_event_stream_length(IonEventStream *stream, size_t index);
 /**
  * Reads IonEvents from the given BYTE* of Ion data into the given IonEventStream.
  */
-iERR ion_event_stream_read_all_from_bytes(const BYTE *ion_string, SIZE len, ION_CATALOG *catalog,
+iERR ion_event_stream_read_all_from_bytes(const BYTE *ion_string, ION_SIZE len, ION_CATALOG *catalog,
                                           IonEventStream *stream, IonEventResult *result = NULL);
 
 /**
@@ -138,7 +138,7 @@ iERR ion_event_stream_read_imports(hREADER reader, ION_COLLECTION *imports, std:
  * bytes.
  */
 iERR ion_event_stream_write_all_to_bytes(IonEventStream *stream, ION_EVENT_OUTPUT_TYPE output_type,
-                                         ION_CATALOG *catalog, BYTE **out, SIZE *len, IonEventResult *result);
+                                         ION_CATALOG *catalog, BYTE **out, ION_SIZE *len, IonEventResult *result);
 
 /**
  * Copies the event so that it may be used outside the scope of its owning stream.

@@ -43,21 +43,21 @@ INSTANTIATE_TEST_CASE_P(IonTimestampParameterized, IonTimestamp, testing::Values
 // regression for https://github.com/amzn/ion-c/issues/144
 TEST_P(IonTimestamp, ion_timestamp_to_time_t) {
     ION_TIMESTAMP timestamp;
-    SIZE chars_used;
+    ION_SIZE chars_used;
     time_t actual_time;
 
-    ION_ASSERT_OK(ion_timestamp_parse(&timestamp, (char *)str.c_str(), (SIZE)strlen(str.c_str()), &chars_used, &g_IonEventDecimalContext));
+    ION_ASSERT_OK(ion_timestamp_parse(&timestamp, (char *)str.c_str(), (ION_SIZE)strlen(str.c_str()), &chars_used, &g_IonEventDecimalContext));
     ION_ASSERT_OK(ion_timestamp_to_time_t(&timestamp, &actual_time));
     ASSERT_EQ(time, actual_time);
 }
 
 TEST_P(IonTimestamp, ion_timestamp_for_time_t) {
     ION_TIMESTAMP timestamp;
-    SIZE chars_used;
+    ION_SIZE chars_used;
 
     ION_ASSERT_OK(ion_timestamp_for_time_t(&timestamp, &time));
     char to_string[ION_TIMESTAMP_STRING_LENGTH+1];
-    ION_ASSERT_OK(ion_timestamp_to_string(&timestamp, (char *)to_string, (SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
+    ION_ASSERT_OK(ion_timestamp_to_string(&timestamp, (char *)to_string, (ION_SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
     to_string[chars_used] = '\0';
 
     ASSERT_STREQ(str_unknown_offset.c_str(), to_string);
@@ -65,11 +65,11 @@ TEST_P(IonTimestamp, ion_timestamp_for_time_t) {
 
 TEST_P(IonTimestamp, has_and_get_local_offset) {
     ION_TIMESTAMP timestamp;
-    SIZE chars_used;
+    ION_SIZE chars_used;
     int offset;
     BOOL has_local_offset;
 
-    ION_ASSERT_OK(ion_timestamp_parse(&timestamp, (char *)str.c_str(), (SIZE)strlen(str.c_str()), &chars_used, &g_IonEventDecimalContext));
+    ION_ASSERT_OK(ion_timestamp_parse(&timestamp, (char *)str.c_str(), (ION_SIZE)strlen(str.c_str()), &chars_used, &g_IonEventDecimalContext));
     ION_ASSERT_OK(ion_timestamp_has_local_offset(&timestamp, &has_local_offset));
     ASSERT_TRUE(has_local_offset);
 
@@ -127,13 +127,13 @@ INSTANTIATE_TEST_CASE_P(IonTimestampHighPrecisionParameterized, IonTimestampHigh
 TEST_P(IonTimestampHighPrecision, TextWriterCanWriteHighPrecisionFraction) {
     ION_TIMESTAMP timestamp;
     decQuad fraction;
-    SIZE chars_used;
+    ION_SIZE chars_used;
 
     decQuadFromString(&fraction, scientific_notation.c_str(), &g_IonEventDecimalContext);
     ION_ASSERT_OK(ion_timestamp_for_fraction(&timestamp, 2007, 1, 1, 12, 59, 59, &fraction, &g_IonEventDecimalContext));
 
     char to_string[ION_TIMESTAMP_STRING_LENGTH + 1];
-    ION_ASSERT_OK(ion_timestamp_to_string(&timestamp, (char *)to_string, (SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
+    ION_ASSERT_OK(ion_timestamp_to_string(&timestamp, (char *)to_string, (ION_SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
     to_string[chars_used] = '\0';
 
     char expected[ION_TIMESTAMP_STRING_LENGTH + 1];
@@ -165,7 +165,7 @@ INSTANTIATE_TEST_CASE_P(IonTimestampOutOfRangeFractionParameterized, IonTimestam
 TEST_P(IonTimestampOutOfRangeFraction, WriterFailsOnOutOfRangeFraction) {
     ION_TIMESTAMP timestamp;
     decQuad fraction;
-    SIZE chars_used;
+    ION_SIZE chars_used;
     hWRITER writer;
     ION_STREAM *stream;
 
@@ -177,7 +177,7 @@ TEST_P(IonTimestampOutOfRangeFraction, WriterFailsOnOutOfRangeFraction) {
     SET_FLAG_ON(timestamp.precision, ION_TS_FRAC);
 
     char to_string[ION_TIMESTAMP_STRING_LENGTH + 1];
-    ASSERT_EQ(IERR_INVALID_TIMESTAMP, ion_timestamp_to_string(&timestamp, (char *)to_string, (SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
+    ASSERT_EQ(IERR_INVALID_TIMESTAMP, ion_timestamp_to_string(&timestamp, (char *)to_string, (ION_SIZE)sizeof(to_string), &chars_used, &g_IonEventDecimalContext));
 
     ION_ASSERT_OK(ion_test_new_writer(&writer, &stream, true));
     ASSERT_EQ(IERR_INVALID_TIMESTAMP, ion_writer_write_timestamp(writer, &timestamp));

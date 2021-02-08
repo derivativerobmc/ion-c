@@ -37,7 +37,7 @@ TEST(IonBinaryLen, Int64) {
     ASSERT_EQ(2, ion_binary_len_int_64(-256LL));
 }
 
-iERR ion_test_add_annotations(BOOL is_binary, BYTE **out, SIZE *len) {
+iERR ion_test_add_annotations(BOOL is_binary, BYTE **out, ION_SIZE *len) {
     iENTER;
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
@@ -54,7 +54,7 @@ iERR ion_test_add_annotations(BOOL is_binary, BYTE **out, SIZE *len) {
 
 TEST(IonWriterAddAnnotation, SameInTextAndBinary) {
     BYTE *binary_data, *text_data;
-    SIZE binary_len, text_len;
+    ION_SIZE binary_len, text_len;
     IonEventStream binary_stream, text_stream;
     ION_ASSERT_OK(ion_test_add_annotations(TRUE, &binary_data, &binary_len));
     ION_ASSERT_OK(ion_test_add_annotations(FALSE, &text_data, &text_len));
@@ -67,7 +67,7 @@ TEST(IonBinaryTimestamp, WriterConvertsToUTC) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_TIMESTAMP timestamp;
 
     ION_ASSERT_OK(ion_timestamp_for_minute(&timestamp, 2008, 3, 1, 0, 0));
@@ -102,7 +102,7 @@ TEST(IonBinaryTimestamp, WriterIgnoresSuperfluousOffset) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_TIMESTAMP timestamp;
 
     ION_ASSERT_OK(ion_timestamp_for_year(&timestamp, 1));
@@ -137,7 +137,7 @@ TEST(IonBinarySymbol, WriterWritesSymbolValueThatLooksLikeSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -146,7 +146,7 @@ TEST(IonBinarySymbol, WriterWritesSymbolValueThatLooksLikeSymbolZero) {
     ION_ASSERT_OK(ion_writer_write_symbol(writer, &symbol_zero));
     ION_ASSERT_OK(ion_test_writer_get_bytes(writer, ion_stream, &result, &result_len));
 
-    // NOTE: the symbol value refers to \x0A (i.e. SID 10 -- a local symbol), NOT \x00 (SID 0). This is because the
+    // NOTE: the symbol value refers to \x0A (i.e. ION_SID 10 -- a local symbol), NOT \x00 (ION_SID 0). This is because the
     // ion_writer_write_symbol API, which takes a string from the user, was used.
     assertBytesEqual("\x71\x0A", 2, result + result_len - 2, 2);
 }
@@ -155,7 +155,7 @@ TEST(IonBinarySymbol, WriterWritesSymbolValueSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
 
     ION_ASSERT_OK(ion_test_new_writer(&writer, &ion_stream, TRUE));
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 0));
@@ -169,7 +169,7 @@ TEST(IonBinarySymbol, WriterWritesAnnotationThatLooksLikeSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -179,7 +179,7 @@ TEST(IonBinarySymbol, WriterWritesAnnotationThatLooksLikeSymbolZero) {
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 0));
     ION_ASSERT_OK(ion_test_writer_get_bytes(writer, ion_stream, &result, &result_len));
 
-    // NOTE: the annotation refers to \x8A (i.e. SID 10 -- a local symbol), NOT \x80 (SID 0). This is because the
+    // NOTE: the annotation refers to \x8A (i.e. ION_SID 10 -- a local symbol), NOT \x80 (ION_SID 0). This is because the
     // ion_writer_add_annotation API, which takes a string from the user, was used.
     assertBytesEqual("\xE3\x81\x8A\x70", 4, result + result_len - 4, 4);
 }
@@ -188,7 +188,7 @@ TEST(IonBinarySymbol, WriterWritesAnnotationSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
 
     ION_ASSERT_OK(ion_test_new_writer(&writer, &ion_stream, TRUE));
     ION_ASSERT_OK(ion_test_writer_add_annotation_sid(writer, 0));
@@ -203,7 +203,7 @@ TEST(IonBinarySymbol, WriterWritesFieldNameThatLooksLikeSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING symbol_zero;
 
     ion_string_from_cstr("$0", &symbol_zero);
@@ -216,7 +216,7 @@ TEST(IonBinarySymbol, WriterWritesFieldNameThatLooksLikeSymbolZero) {
     ION_ASSERT_OK(ion_writer_finish_container(writer));
     ION_ASSERT_OK(ion_test_writer_get_bytes(writer, ion_stream, &result, &result_len));
 
-    // NOTE: the field name and annotation refer to \x8A (i.e. SID 10 -- a local symbol), NOT \x80 (SID 0).
+    // NOTE: the field name and annotation refer to \x8A (i.e. ION_SID 10 -- a local symbol), NOT \x80 (ION_SID 0).
     // This is due to use of APIs that accept a string from the user.
     assertBytesEqual("\xD5\x8A\xE3\x81\x8A\x70", 6, result + result_len - 6, 6);
 }
@@ -225,7 +225,7 @@ TEST(IonBinarySymbol, WriterWritesFieldNameSymbolZero) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
 
     ION_ASSERT_OK(ion_test_new_writer(&writer, &ion_stream, TRUE));
     ION_ASSERT_OK(ion_writer_start_container(writer, tid_STRUCT));
@@ -257,7 +257,7 @@ TEST(IonBinarySymbol, ReaderReadsSymbolValueZeroAsSID) {
     hREADER reader;
     BYTE *symbol_zero = (BYTE *)"\xE0\x01\x00\xEA\x70";
     ION_TYPE actual_type;
-    SID actual;
+    ION_SID actual;
     hSYMTAB symbol_table;
     ION_STRING *symbol_value;
 
@@ -278,7 +278,7 @@ TEST(IonBinarySymbol, WriterWritesSymbolValueIVM) {
     hWRITER writer = NULL;
     ION_STREAM *ion_stream = NULL;
     BYTE *result;
-    SIZE result_len;
+    ION_SIZE result_len;
     ION_STRING ivm_text;
 
     ION_ASSERT_OK(ion_string_from_cstr("$ion_1_0", &ivm_text));
@@ -310,7 +310,7 @@ TEST(IonBinarySymbol, ReaderReadsSymbolValueIVMNoOp) {
     hREADER reader;
     BYTE *data = (BYTE *)"\xE0\x01\x00\xEA\x71\x02\x71\x04";
     ION_TYPE actual_type;
-    SID sid;
+    ION_SID sid;
 
     ION_ASSERT_OK(ion_reader_open_buffer(&reader, data, 8, NULL));
     ION_ASSERT_OK(ion_reader_next(reader, &actual_type));
@@ -324,14 +324,14 @@ TEST(IonBinarySymbol, ReaderReadsIVMInsideAnnotationWrapper) {
     hREADER reader;
     BYTE *data = (BYTE *)"\xE0\x01\x00\xEA\xE4\x81\x84\x71\x02";
     ION_TYPE actual_type;
-    SID sid;
+    ION_SID sid;
     ION_STRING annotation;
 
     ION_ASSERT_OK(ion_reader_open_buffer(&reader, data, 9, NULL));
     ION_ASSERT_OK(ion_reader_next(reader, &actual_type));
     ASSERT_EQ(tid_SYMBOL, actual_type);
     ION_ASSERT_OK(ion_reader_get_an_annotation(reader, 0, &annotation));
-    assertStringsEqual("name", (char *)annotation.value, annotation.length); // SID 4 is "name"
+    assertStringsEqual("name", (char *)annotation.value, annotation.length); // ION_SID 4 is "name"
     ION_ASSERT_OK(ion_test_reader_read_symbol_sid(reader, &sid));
     ASSERT_EQ(2, sid);
     ION_ASSERT_OK(ion_reader_close(reader));

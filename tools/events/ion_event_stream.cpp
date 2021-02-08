@@ -46,7 +46,7 @@ void ion_free_symbol(ION_SYMBOL *symbol) {
     }
 }
 
-void ion_free_symbols(ION_SYMBOL *symbols, SIZE len) {
+void ion_free_symbols(ION_SYMBOL *symbols, ION_SIZE len) {
     if (symbols) {
         for (int i = 0; i < len; i++) {
             ion_free_symbol_components(&symbols[i]);
@@ -140,7 +140,7 @@ void ion_copy_symbols(ION_SYMBOL **dst, ION_SYMBOL *src, size_t count) {
 }
 
 IonEvent::IonEvent(ION_EVENT_TYPE event_type, ION_TYPE ion_type, ION_SYMBOL *field_name, ION_SYMBOL *annotations,
-                   SIZE num_annotations, int depth) {
+                   ION_SIZE num_annotations, int depth) {
     this->event_type = event_type;
     this->ion_type = ion_type;
     ion_copy_symbol(&this->field_name, field_name);
@@ -169,7 +169,7 @@ IonEventStream::~IonEventStream() {
 }
 
 IonEvent * IonEventStream::appendNew(ION_EVENT_TYPE event_type, ION_TYPE ion_type, ION_SYMBOL *field_name,
-                                      ION_SYMBOL *annotations, SIZE num_annotations, int depth) {
+                                      ION_SYMBOL *annotations, ION_SIZE num_annotations, int depth) {
     IonEvent *event = new IonEvent(event_type, ion_type, field_name, annotations, num_annotations, depth);
     event_stream->push_back(event);
     return event;
@@ -310,7 +310,7 @@ iERR ion_event_stream_read(hREADER hreader, IonEventStream *stream, ION_TYPE t, 
     iENTER;
     ION_SET_ERROR_CONTEXT(&stream->location, NULL);
     BOOL is_null;
-    SIZE annotation_count = 0;
+    ION_SIZE annotation_count = 0;
     ION_SYMBOL *field_name = NULL;
     ION_SYMBOL *annotations = NULL;
     BYTE *lob_tmp = NULL;
@@ -386,7 +386,7 @@ iERR ion_event_stream_read(hREADER hreader, IonEventStream *stream, ION_TYPE t, 
         case tid_CLOB_INT: // intentional fall-through
         case tid_BLOB_INT:
         {
-            SIZE length, bytes_read;
+            ION_SIZE length, bytes_read;
             IONCREAD(ion_reader_get_lob_size(hreader, &length));
             lob_tmp = (BYTE*)malloc((size_t)length * sizeof(BYTE));
             if (length) {
@@ -665,7 +665,7 @@ iERR ion_event_stream_write_scalar_value_comparison_result(std::string *comparis
     location = &scalar_location;
     IonEventWriterContext writer_context;
     BYTE *value = NULL;
-    SIZE len;
+    ION_SIZE len;
     ASSERT(comparison_report);
 
     IONREPORT(ion_event_in_memory_writer_open(&writer_context, OUTPUT_TYPE_TEXT_PRETTY, /*imports=*/NULL,
@@ -785,11 +785,11 @@ iERR ion_event_stream_get_consensus_value(ION_CATALOG *catalog, std::string *val
     ASSERT(value_text);
 
     if (!value_binary->empty()) {
-        IONREPORT(ion_event_stream_read_all_from_bytes(&(*value_binary)[0], (SIZE)value_binary->size(), catalog, &binary_stream,
+        IONREPORT(ion_event_stream_read_all_from_bytes(&(*value_binary)[0], (ION_SIZE)value_binary->size(), catalog, &binary_stream,
                                                        ION_RESULT_ARG));
     }
     if (!value_text->empty()) {
-        IONREPORT(ion_event_stream_read_all_from_bytes((BYTE *)value_text->c_str(), (SIZE)value_text->length(), catalog,
+        IONREPORT(ion_event_stream_read_all_from_bytes((BYTE *)value_text->c_str(), (ION_SIZE)value_text->length(), catalog,
                                                        &text_stream, ION_RESULT_ARG));
     }
 
@@ -1008,7 +1008,7 @@ iERR ion_event_stream_read_event(hREADER reader, ION_EVENT_READ_PARAMS) {
         IONFAILSTATE(IERR_INVALID_ARG, "Invalid event: only SCALAR and CONTAINER_START events may have a field_name.");
     }
     event = stream->appendNew(value_event_type, value_ion_type, p_value_field_name, p_value_annotations,
-                              (SIZE) value_annotations.size(), value_depth);
+                              (ION_SIZE) value_annotations.size(), value_depth);
     if (value_event_type == SCALAR) {
         event->value = consensus_value;
     }
@@ -1105,7 +1105,7 @@ iERR ion_event_stream_read_all(hREADER reader, ION_EVENT_READ_PARAMS) {
     cRETURN;
 }
 
-iERR ion_event_stream_read_all_from_bytes(const BYTE *ion_string, SIZE len, ION_EVENT_READ_PARAMS) {
+iERR ion_event_stream_read_all_from_bytes(const BYTE *ion_string, ION_SIZE len, ION_EVENT_READ_PARAMS) {
     iENTER;
     ION_SET_ERROR_CONTEXT(&ION_STREAM_ARG->location, NULL);
     hREADER      reader;
@@ -1202,7 +1202,7 @@ iERR _ion_event_stream_write_all_recursive(hWRITER writer, IonEventStream *strea
 
 iERR _ion_event_stream_write_all_to_bytes_helper(IonEventStream *stream, size_t start_index, size_t end_index,
                                                  ION_EVENT_OUTPUT_TYPE output_type, ION_CATALOG *catalog, BYTE **out,
-                                                 SIZE *len, IonEventResult *ION_RESULT_ARG) {
+                                                 ION_SIZE *len, IonEventResult *ION_RESULT_ARG) {
     iENTER;
     IonEventWriterContext writer_context;
     IONREPORT(ion_event_in_memory_writer_open(&writer_context, output_type, NULL, catalog, &stream->location,
@@ -1218,7 +1218,7 @@ cleanup:
  * Constructs a writer using the given test type and catalog and uses it to write the given IonEventStream to BYTEs.
  */
 iERR ion_event_stream_write_all_to_bytes(IonEventStream *stream, ION_EVENT_OUTPUT_TYPE output_type,
-                                         ION_CATALOG *catalog, BYTE **out, SIZE *len, IonEventResult *ION_RESULT_ARG) {
+                                         ION_CATALOG *catalog, BYTE **out, ION_SIZE *len, IonEventResult *ION_RESULT_ARG) {
     iENTER;
     IONREPORT(_ion_event_stream_write_all_to_bytes_helper(stream, 0, stream->size(), output_type, catalog, out, len,
                                                           ION_RESULT_ARG));
@@ -1372,7 +1372,7 @@ BOOL _ion_event_stream_symbol_value_resembles_IVM(ION_SYMBOL *symbol) {
     return FALSE;
 }
 
-iERR ion_event_stream_write_scalar_value(ION_EVENT_OUTPUT_TYPE output_type, IonEvent *event, BYTE **value, SIZE *len,
+iERR ion_event_stream_write_scalar_value(ION_EVENT_OUTPUT_TYPE output_type, IonEvent *event, BYTE **value, ION_SIZE *len,
                                          ION_EVENT_WRITER_INDEX_PARAMS) {
     iENTER;
     ASSERT(ION_LOCATION_ARG);
@@ -1434,7 +1434,7 @@ iERR ion_event_stream_write_scalar_event(hWRITER writer, IonEvent *event, ION_EV
     ASSERT(ION_LOCATION_ARG);
     ION_SET_ERROR_CONTEXT(ION_LOCATION_ARG, ION_INDEX_ARG);
     BYTE *text_value = NULL, *binary_value = NULL;
-    SIZE text_len, binary_len;
+    ION_SIZE text_len, binary_len;
     ION_STRING text_stream;
 
     IONREPORT(ion_event_stream_write_scalar_value(OUTPUT_TYPE_TEXT_UGLY, event, &text_value, &text_len,

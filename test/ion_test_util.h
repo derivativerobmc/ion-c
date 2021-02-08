@@ -51,31 +51,31 @@ iERR ion_test_new_writer(hWRITER *writer, ION_STREAM **ion_stream, BOOL is_binar
  * @param len - the length of the written bytes.
  * @return IERR_OK, unless the writer or stream fails to close.
  */
-iERR ion_test_writer_get_bytes(hWRITER writer, ION_STREAM *ion_stream, BYTE **out, SIZE *len);
+iERR ion_test_writer_get_bytes(hWRITER writer, ION_STREAM *ion_stream, BYTE **out, ION_SIZE *len);
 
 /**
- * Creates an ION_SYMBOL with the given SID and calls `ion_writer_write_ion_symbol`.
+ * Creates an ION_SYMBOL with the given ION_SID and calls `ion_writer_write_ion_symbol`.
  * @param writer - the writer to write to.
- * @param sid - the local SID of the symbol to be written.
+ * @param sid - the local ION_SID of the symbol to be written.
  * @return the result of `ion_writer_write_ion_symbol`.
  */
-iERR ion_test_writer_write_symbol_sid(ION_WRITER *writer, SID sid);
+iERR ion_test_writer_write_symbol_sid(ION_WRITER *writer, ION_SID sid);
 
 /**
- * Creates an ION_SYMBOL with the given SID and calls `ion_writer_add_annotation_symbol`.
+ * Creates an ION_SYMBOL with the given ION_SID and calls `ion_writer_add_annotation_symbol`.
  * @param writer - the writer to write to.
- * @param sid - the local SID of the symbol to be written.
+ * @param sid - the local ION_SID of the symbol to be written.
  * @return the result of `ion_writer_add_annotation_symbol`.
  */
-iERR ion_test_writer_add_annotation_sid(ION_WRITER *writer, SID sid);
+iERR ion_test_writer_add_annotation_sid(ION_WRITER *writer, ION_SID sid);
 
 /**
- * Creates an ION_SYMBOL with the given SID and calls `ion_writer_write_field_name_symbol`.
+ * Creates an ION_SYMBOL with the given ION_SID and calls `ion_writer_write_field_name_symbol`.
  * @param writer - the writer to write to.
- * @param sid - the local SID of the symbol to be written.
+ * @param sid - the local ION_SID of the symbol to be written.
  * @return the result of `ion_writer_write_field_name_symbol`.
  */
-iERR ion_test_writer_write_field_name_sid(ION_WRITER *writer, SID sid);
+iERR ion_test_writer_write_field_name_sid(ION_WRITER *writer, ION_SID sid);
 
 /**
  * Assigns the given char * to an ION_STRING, without copying.
@@ -92,7 +92,7 @@ iERR ion_string_from_cstr(const char *cstr, ION_STRING *out);
  * @param reader - the reader to initialize and open.
  * @return IERR_OK, unless the reader fails to open.
  */
-iERR ion_test_new_reader(BYTE *ion_data, SIZE buffer_length, hREADER *reader);
+iERR ion_test_new_reader(BYTE *ion_data, ION_SIZE buffer_length, hREADER *reader);
 
 /**
  * Initializes and opens a new in-memory reader over the given string of Ion text.
@@ -103,12 +103,12 @@ iERR ion_test_new_reader(BYTE *ion_data, SIZE buffer_length, hREADER *reader);
 iERR ion_test_new_text_reader(const char *ion_text, hREADER *reader);
 
 /**
- * Reads an ION_SYMBOL and provides its local SID.
+ * Reads an ION_SYMBOL and provides its local ION_SID.
  * @param reader - the reader from which to read.
- * @param sid - Output parameter for the local SID of the symbol
+ * @param sid - Output parameter for the local ION_SID of the symbol
  * @return the result of `ion_reader_read_symbol.`
  */
-iERR ion_test_reader_read_symbol_sid(ION_READER *reader, SID *sid);
+iERR ion_test_reader_read_symbol_sid(ION_READER *reader, ION_SID *sid);
 
 /**
  * Reads the Ion string at the given reader's current position and assigns its contents
@@ -124,6 +124,6 @@ iERR ion_read_string_as_chars(hREADER reader, char **out);
  * @param bytes - the bytes to print.
  * @param length - the number of bytes to print.
  */
-void ion_test_print_bytes(BYTE *bytes, SIZE length);
+void ion_test_print_bytes(BYTE *bytes, ION_SIZE length);
 
 #endif //IONC_ION_TEST_UTIL_H

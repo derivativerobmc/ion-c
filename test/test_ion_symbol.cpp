@@ -25,7 +25,7 @@ INSTANTIATE_TEST_CASE_BOOLEAN_PARAM(IonSymbolTable);
 #define ION_SYMBOL_TEST_DECLARE_WRITER \
     hWRITER writer; \
     ION_STREAM *stream; \
-    SIZE bytes_flushed;
+    ION_SIZE bytes_flushed;
 
 #define _ION_SYMBOL_TEST_REWRITE_AND_ASSERT_WITH_CATALOG(retrieve_data, cleanup_data, as_binary, expected, expected_len) \
     hREADER reader; \
@@ -83,7 +83,7 @@ INSTANTIATE_TEST_CASE_BOOLEAN_PARAM(IonSymbolTable);
     ION_SYMBOL_TABLE *writer_imports[2]; \
     hSYMTAB import1, import2; \
     ION_STRING import1_name, import2_name, sym1, sym2, sym3; \
-    SID sid; \
+    ION_SID sid; \
     hCATALOG catalog; \
     ION_ASSERT_OK(ion_string_from_cstr("import1", &import1_name)); \
     ION_ASSERT_OK(ion_string_from_cstr("import2", &import2_name)); \
@@ -133,7 +133,7 @@ TEST(IonSymbolTable, WriterAppendsLocalSymbolsOnFlush) {
     ION_ASSERT_OK(ion_writer_flush(writer, &bytes_flushed));
     ASSERT_NE(0, bytes_flushed);
 
-    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // This gets SID 12.
+    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // This gets ION_SID 12.
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10)); // sym1 is still in scope.
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 12)); // This corresponds to sym3.
 
@@ -164,13 +164,13 @@ TEST_P(BinaryAndTextTest, WriterAppendsLocalSymbolsWithImportsOnFlush) {
     ASSERT_NE(0, bytes_flushed);
 
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10));
-    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with SID 12
+    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with ION_SID 12
     ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym4));
     if (is_binary) {
         ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 13)); // Corresponds to sym4.
     }
     else {
-        // When local symbols are written by a text writer, they are not assigned SIDs, so trying to write SID 13 would
+        // When local symbols are written by a text writer, they are not assigned SIDs, so trying to write ION_SID 13 would
         // fail here.
         ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym4));
     }
@@ -246,8 +246,8 @@ TEST(IonSymbolTable, SharedSymbolTableCanBelongToMultipleCatalogs) {
     ion_event_initialize_reader_options(&reader_options_2);
     reader_options_2.pcatalog = catalog_2;
 
-    ION_ASSERT_OK(ion_reader_open_buffer(&reader_1, (BYTE *)ion_text_1, (SIZE)strlen(ion_text_1), &reader_options_1));
-    ION_ASSERT_OK(ion_reader_open_buffer(&reader_2, (BYTE *)ion_text_2, (SIZE)strlen(ion_text_2), &reader_options_2));
+    ION_ASSERT_OK(ion_reader_open_buffer(&reader_1, (BYTE *)ion_text_1, (ION_SIZE)strlen(ion_text_1), &reader_options_1));
+    ION_ASSERT_OK(ion_reader_open_buffer(&reader_2, (BYTE *)ion_text_2, (ION_SIZE)strlen(ion_text_2), &reader_options_2));
 
     ION_ASSERT_OK(ion_reader_next(reader_1, &type));
     ION_ASSERT_OK(ion_reader_next(reader_2, &type));
@@ -278,7 +278,7 @@ TEST(IonSymbolTable, SharedSymbolTableCanBelongToMultipleCatalogs) {
 
 TEST_P(BinaryAndTextTest, ManuallyWritingSymbolTableStructIsRecognizedAsSymbolTable) {
     // If the user manually writes a struct that is a local symbol table, it should become the active LST, and it
-    // should be possible for the user to subsequently write any SID within the new table's max_id.
+    // should be possible for the user to subsequently write any ION_SID within the new table's max_id.
     // It should also be possible for the user to subsequently write additional symbols within the same context and
     // have them added to the symbol table. This means that instead of actually writing out the manually-written
     // symbol table up front, it must be intercepted, turned into a mutable ION_SYMBOL_TABLE, and written out at
@@ -543,7 +543,7 @@ TEST_P(BinaryAndTextTest, ManuallyWritingImportWithNoNameIsIgnored) {
     ION_ASSERT_OK(ion_writer_finish_container(writer));
     ION_ASSERT_OK(ion_writer_finish_container(writer));
 
-    // NOTE: the ignored import had space for one symbol. If it weren't ignored, SID 10 would fall within its range.
+    // NOTE: the ignored import had space for one symbol. If it weren't ignored, ION_SID 10 would fall within its range.
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10));
 
     ION_SYMBOL_TEST_REWRITE_FROM_WRITER_AND_ASSERT_TEXT("foo");
@@ -598,8 +598,8 @@ TEST_P(BinaryAndTextTest, ManuallyWriteSymbolTableAppendSucceeds) {
         ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 12));
     }
     else {
-        // Text writers never intern symbols with known text, so sym1 and sym2 never had SID mappings.
-        // Because sym3 is manually interned, it gets SID 10.
+        // Text writers never intern symbols with known text, so sym1 and sym2 never had ION_SID mappings.
+        // Because sym3 is manually interned, it gets ION_SID 10.
         ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym1));
         ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym2));
         ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10));
@@ -646,7 +646,7 @@ TEST_P(BinaryAndTextTest, ManuallyWriteSymbolTableAppendWithImportsSucceeds) {
     ION_ASSERT_OK(ion_writer_finish_container(writer));
 
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10));
-    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with SID 12
+    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with ION_SID 12
     ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym4));
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 13)); // Corresponds to sym4.
 
@@ -703,7 +703,7 @@ TEST_P(BinaryAndTextTest, SymbolTableSetterWithManualLSTInProgressFails) {
 }
 
 TEST(IonSymbolTable, TextWritingKnownSymbolFromSIDResolvesText) {
-    // If the user writes a SID in the import range and that import is found in the writer's imports list, that SID
+    // If the user writes a ION_SID in the import range and that import is found in the writer's imports list, that ION_SID
     // should be resolved to its text representation. There is no need to include the local symbol table in the stream.
     ION_SYMBOL_TEST_POPULATE_CATALOG;
     ION_SYMBOL_TEST_OPEN_WRITER_WITH_IMPORTS(FALSE, writer_imports, 2);
@@ -721,10 +721,10 @@ TEST(IonSymbolTable, TextWritingKnownSymbolFromSIDResolvesText) {
 }
 
 TEST(IonSymbolTable, TextWritingSymbolWithUnknownTextAsSidFromImportWritesIdentifierAndForcesSymbolTable) {
-    // If the user writes a local SID in the import range and that import is not found in the catalog, the SID must be
+    // If the user writes a local ION_SID in the import range and that import is not found in the catalog, the ION_SID must be
     // written as $<int> and the symbol table must be included in the stream. Future consumers may have access to
     // that import and be able to resolve the identifier.
-    // This test also verifies that a shared symbol table with NULL elements within its symbols list are valid SID
+    // This test also verifies that a shared symbol table with NULL elements within its symbols list are valid ION_SID
     // mappings with unknown text.
     const char *shared_table = "$ion_shared_symbol_table::{name:'''foo''', version: 1, symbols:['''abc''', null, '''def''']}";
     hREADER shared_symtab_reader;
@@ -756,8 +756,8 @@ TEST_P(BinaryAndTextTest, WritingSymbolTokensWithUnknownTextFromImport) {
     // because (in the case of the text writer) the symbol table has already been written (to avoid buffering) by the
     // time the writer reaches the value region of the stream -- UNLESS the import is found in the catalog AND the text
     // is known. In that case, for text writers, the text can simply be written; for binary writers, the text can be
-    // interned into the LST and a local SID written.
-    // If the user writes an ION_SYMBOL from an import and that import is not found in the catalog, the SID must be
+    // interned into the LST and a local ION_SID written.
+    // If the user writes an ION_SYMBOL from an import and that import is not found in the catalog, the ION_SID must be
     // written as $<int> and the symbol table must be included in the stream. Future consumers may have access to
     // that import and be able to resolve the identifier.
     const char *shared_table = "$ion_shared_symbol_table::{name:'''foo''', version: 1, symbols:['''abc''', null, '''def''']}";
@@ -846,7 +846,7 @@ TEST_P(BinaryAndTextTest, WritingSymbolTokensWithUnknownTextFromCatalog) {
 }
 
 TEST_P(BinaryAndTextTest, WritingInvalidIonSymbolFails) {
-    // Tests that an invalid ION_SYMBOL (undefined text, import location, and local SID) raises an error.
+    // Tests that an invalid ION_SYMBOL (undefined text, import location, and local ION_SID) raises an error.
     ION_SYMBOL_TEST_DECLARE_WRITER;
     ION_WRITER_OPTIONS writer_options;
     ION_SYMBOL symbol;
@@ -899,8 +899,8 @@ TEST_P(BinaryAndTextTest, WritingIonSymbolWithUnknownTextNotFoundInImportsOrCata
 }
 
 TEST(IonSymbolTable, TextWritingSymbolWithUnknownTextFromManuallyWrittenSymbolTableWritesIdentifierAndForcesSymbolTable) {
-    // If the user writes a SID in the import range of a manually written symbol table with import(s) and that import is
-    // not found in the catalog, the SID must be written as $<int> and the symbol table must be included in the stream.
+    // If the user writes a ION_SID in the import range of a manually written symbol table with import(s) and that import is
+    // not found in the catalog, the ION_SID must be written as $<int> and the symbol table must be included in the stream.
     // Future consumers may have access to that import and be able to resolve the identifier.
     ION_SYMBOL_TEST_DECLARE_WRITER;
     BYTE *result;
@@ -931,7 +931,7 @@ TEST(IonSymbolTable, TextWritingSymbolWithUnknownTextFromManuallyWrittenSymbolTa
 }
 
 TEST_P(BinaryAndTextTest, WritingOutOfRangeSIDFails) {
-    // For both text and binary, manually writing a SID (from a pure SID or ION_SYMBOL with NULL text) that is out of
+    // For both text and binary, manually writing a ION_SID (from a pure ION_SID or ION_SYMBOL with NULL text) that is out of
     // range of the current symbol table context should raise an error, since this condition must also raise an error
     // on read.
     ION_SYMBOL_TEST_DECLARE_WRITER;
@@ -977,7 +977,7 @@ TEST(IonSymbolTable, SettingSharedSymbolTableMaxIdLargerThanLengthOfSymbolsExten
 
     ION_STRING sid_10, sid_11, sid_12, sid_13, sid_14;
 
-    ION_ASSERT_OK(ion_reader_open_buffer(&reader, (BYTE *)ion_data, (SIZE)strlen(ion_data), &reader_options));
+    ION_ASSERT_OK(ion_reader_open_buffer(&reader, (BYTE *)ion_data, (ION_SIZE)strlen(ion_data), &reader_options));
 
     ION_ASSERT_OK(ion_reader_next(reader, &type));
     ASSERT_EQ(tid_SYMBOL, type);
@@ -999,11 +999,11 @@ TEST(IonSymbolTable, SettingSharedSymbolTableMaxIdLargerThanLengthOfSymbolsExten
     ASSERT_EQ(tid_SYMBOL, type);
     ION_ASSERT_OK(ion_reader_read_string(reader, &sid_14));
 
-    assertStringsEqual("sym1", (char *)sid_10.value, (SIZE)sid_10.length);
+    assertStringsEqual("sym1", (char *)sid_10.value, (ION_SIZE)sid_10.length);
     ASSERT_TRUE(ION_STRING_IS_NULL(&sid_11));
     ASSERT_TRUE(ION_STRING_IS_NULL(&sid_12));
-    assertStringsEqual("sym2", (char *)sid_13.value, (SIZE)sid_13.length);
-    assertStringsEqual("sym3", (char *)sid_14.value, (SIZE)sid_14.length);
+    assertStringsEqual("sym2", (char *)sid_13.value, (ION_SIZE)sid_13.length);
+    assertStringsEqual("sym3", (char *)sid_14.value, (ION_SIZE)sid_14.length);
 
     ION_ASSERT_OK(ion_reader_close(reader));
     ION_ASSERT_OK(ion_catalog_close(catalog));
@@ -1028,13 +1028,13 @@ TEST_P(BinaryAndTextTest, WriterWithImportsListIncludesThoseImportsWithEveryNewL
 
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 10));
     ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 11));
-    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with SID 12
+    ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym3)); // sym3 is already in the symbol table, with ION_SID 12
     ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym4));
     if (is_binary) {
         ION_ASSERT_OK(ion_test_writer_write_symbol_sid(writer, 13)); // Corresponds to sym4.
     }
     else {
-        // When local symbols are written by a text writer, they are not assigned SIDs, so trying to write SID 13 would
+        // When local symbols are written by a text writer, they are not assigned SIDs, so trying to write ION_SID 13 would
         // fail here.
         ION_ASSERT_OK(ion_writer_write_symbol(writer, &sym4));
     }
@@ -1094,7 +1094,7 @@ TEST(IonSymbolTable, ReadThenWriteSymbolsWithUnknownText) {
     ION_SYMBOL_TEST_DECLARE_WRITER;
     ION_WRITER_OPTIONS writer_options;
     BYTE *result;
-    SID sid;
+    ION_SID sid;
     ION_SYMBOL *symbol;
 
     ION_ASSERT_OK(ion_test_new_text_reader(ion_data, &reader));
@@ -1158,7 +1158,7 @@ TEST_P(BinaryAndTextTest, ReaderCorrectlySetsImportLocation) {
         ion_data_len = strlen((char *)ion_data);
     }
     ION_SYMBOL annotation[1], *field_name, value;
-    SIZE annotation_count;
+    ION_SIZE annotation_count;
     ION_READER_OPTIONS reader_options;
     ion_event_initialize_reader_options(&reader_options);
     reader_options.pcatalog = catalog;
@@ -1207,7 +1207,7 @@ TEST_P(BinaryAndTextTest, LocalSymbolHasNoImportLocation) {
     }
     ION_SYMBOL annotation[1], *field_name, value;
     ION_STRING zoo, zar, zaz;
-    SIZE annotation_count;
+    ION_SIZE annotation_count;
 
     ION_ASSERT_OK(ion_string_from_cstr("zoo", &zoo));
     ION_ASSERT_OK(ion_string_from_cstr("zar", &zar));
@@ -1255,7 +1255,7 @@ TEST_P(BinaryAndTextTest, ReadingOutOfRangeAnnotationSIDFails) {
         ion_data_len = strlen(ion_data);
     }
     ION_SYMBOL annotations[1];
-    SIZE annotation_count;
+    ION_SIZE annotation_count;
 
     ION_ASSERT_OK(ion_reader_open_buffer(&reader, (BYTE *)ion_data, ion_data_len, NULL));
     ION_ASSERT_OK(ion_reader_next(reader, &type));
@@ -1660,7 +1660,7 @@ TEST_P(BinaryAndTextTest, ReaderSkipsOverSymbol) {
     ION_STREAM *ion_stream = NULL;
     ION_STRING abc_written, def_written, def_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
 
     ion_string_from_cstr("abc", &abc_written);
     ion_string_from_cstr("def", &def_written);
@@ -1689,7 +1689,7 @@ TEST_P(BinaryAndTextTest, ReaderSkipsOverIVMBoundary) {
     ION_STREAM *ion_stream = NULL;
     ION_STRING abc_written, def_written, def_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
 
     ion_string_from_cstr("abc", &abc_written);
     ion_string_from_cstr("def", &def_written);

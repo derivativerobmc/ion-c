@@ -25,7 +25,7 @@
 #define ION_EVENT_DECIMAL_MAX_STRLEN (ION_EVENT_DECIMAL_MAX_DIGITS + 14) // 14 extra bytes as specified by decNumber.
 
 #define ION_EVENT_STRING_OR_NULL(ion_string) (ION_STRING_IS_NULL(ion_string) ? std::string("NULL") : std::string((char *)(ion_string)->value, (size_t)(ion_string)->length))
-#define ION_EVENT_ION_STRING_FROM_STRING(ion_string, std_string) (ion_string_assign_cstr(ion_string, (char *)(std_string).c_str(), (SIZE)(std_string).length()))
+#define ION_EVENT_ION_STRING_FROM_STRING(ion_string, std_string) (ion_string_assign_cstr(ion_string, (char *)(std_string).c_str(), (ION_SIZE)(std_string).length()))
 
 /**
  * Global variable that holds the decimal context to be used throughout the tools and
@@ -167,7 +167,7 @@ iERR ion_event_in_memory_writer_open(IonEventWriterContext *writer_context, ION_
  * bytes_len must be non-null. It is the caller's responsibility to free the output bytes, if any.
  */
 iERR ion_event_writer_close(IonEventWriterContext *writer_context, IonEventResult *result, iERR err=IERR_OK,
-                            bool in_memory=false, BYTE **bytes=NULL, SIZE *bytes_len=NULL);
+                            bool in_memory=false, BYTE **bytes=NULL, ION_SIZE *bytes_len=NULL);
 
 /**
  * Creates a debug string describing the given ION_SYMBOL.

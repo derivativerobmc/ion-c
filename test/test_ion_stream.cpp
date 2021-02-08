@@ -77,7 +77,7 @@ TEST(IonStream, ContinuesOverPageBoundary) {
     ION_READER_OPTIONS options;
     ION_TIMESTAMP expected;
     const char *expected_str = "2000-08-07T00:00:00.015Z";
-    SIZE chars_used;
+    ION_SIZE chars_used;
     BOOL is_equal;
 
     _test_in_memory_paged_stream_context context;
@@ -99,7 +99,7 @@ TEST(IonStream, ContinuesOverPageBoundary) {
     ION_ASSERT_OK(ion_stream_close(stream));
 
     ASSERT_EQ(2, context.number_of_handler_invocations);
-    ION_ASSERT_OK(ion_timestamp_parse(&expected, (char *)expected_str, (SIZE)strlen(expected_str), &chars_used, &g_IonEventDecimalContext));
+    ION_ASSERT_OK(ion_timestamp_parse(&expected, (char *)expected_str, (ION_SIZE)strlen(expected_str), &chars_used, &g_IonEventDecimalContext));
     ION_ASSERT_OK(ion_timestamp_equals(&expected, &ts, &is_equal, &g_IonEventDecimalContext));
     ASSERT_TRUE(is_equal);
 }

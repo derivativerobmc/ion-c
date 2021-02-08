@@ -31,22 +31,22 @@ iERR ion_test_new_writer(hWRITER *writer, ION_STREAM **ion_stream, BOOL is_binar
     iRETURN;
 }
 
-iERR ion_test_writer_get_bytes(hWRITER writer, ION_STREAM *ion_stream, BYTE **out, SIZE *len) {
+iERR ion_test_writer_get_bytes(hWRITER writer, ION_STREAM *ion_stream, BYTE **out, ION_SIZE *len) {
     iENTER;
     POSITION pos;
     UPDATEERROR(ion_writer_close(writer));
     pos = ion_stream_get_position(ion_stream);
     UPDATEERROR(ion_stream_seek(ion_stream, 0));
     *out = (BYTE *)(malloc((size_t)pos));
-    UPDATEERROR(ion_stream_read(ion_stream, *out, (SIZE)pos, len));
+    UPDATEERROR(ion_stream_read(ion_stream, *out, (ION_SIZE)pos, len));
     UPDATEERROR(ion_stream_close(ion_stream));
-    if (*len != (SIZE)pos) {
+    if (*len != (ION_SIZE)pos) {
         UPDATEERROR(IERR_EOF);
     }
     iRETURN;
 }
 
-iERR ion_test_writer_write_symbol_sid(ION_WRITER *writer, SID sid) {
+iERR ion_test_writer_write_symbol_sid(ION_WRITER *writer, ION_SID sid) {
     iENTER;
     ION_SYMBOL symbol;
     memset(&symbol, 0, sizeof(ION_SYMBOL));
@@ -55,7 +55,7 @@ iERR ion_test_writer_write_symbol_sid(ION_WRITER *writer, SID sid) {
     iRETURN;
 }
 
-iERR ion_test_writer_add_annotation_sid(ION_WRITER *writer, SID sid) {
+iERR ion_test_writer_add_annotation_sid(ION_WRITER *writer, ION_SID sid) {
     iENTER;
     ION_SYMBOL symbol;
     memset(&symbol, 0, sizeof(ION_SYMBOL));
@@ -64,7 +64,7 @@ iERR ion_test_writer_add_annotation_sid(ION_WRITER *writer, SID sid) {
     iRETURN;
 }
 
-iERR ion_test_writer_write_field_name_sid(ION_WRITER *writer, SID sid) {
+iERR ion_test_writer_write_field_name_sid(ION_WRITER *writer, ION_SID sid) {
     iENTER;
     ION_SYMBOL symbol;
     memset(&symbol, 0, sizeof(ION_SYMBOL));
@@ -77,11 +77,11 @@ iERR ion_string_from_cstr(const char *cstr, ION_STRING *out) {
     iENTER;
     if (!out) FAILWITH(IERR_INVALID_ARG);
     out->value = (BYTE *)cstr;
-    out->length = (SIZE)strlen(cstr);
+    out->length = (ION_SIZE)strlen(cstr);
     iRETURN;
 }
 
-iERR ion_test_new_reader(BYTE *ion_data, SIZE buffer_length, hREADER *reader) {
+iERR ion_test_new_reader(BYTE *ion_data, ION_SIZE buffer_length, hREADER *reader) {
     iENTER;
     ION_READER_OPTIONS options;
     ion_event_initialize_reader_options(&options);
@@ -91,11 +91,11 @@ iERR ion_test_new_reader(BYTE *ion_data, SIZE buffer_length, hREADER *reader) {
 
 iERR ion_test_new_text_reader(const char *ion_text, hREADER *reader) {
     iENTER;
-    IONCHECK(ion_test_new_reader((BYTE *)ion_text, (SIZE)strlen(ion_text), reader));
+    IONCHECK(ion_test_new_reader((BYTE *)ion_text, (ION_SIZE)strlen(ion_text), reader));
     iRETURN;
 }
 
-iERR ion_test_reader_read_symbol_sid(ION_READER *reader, SID *sid) {
+iERR ion_test_reader_read_symbol_sid(ION_READER *reader, ION_SID *sid) {
     iENTER;
     ASSERT(sid);
     ION_SYMBOL symbol;
@@ -112,7 +112,7 @@ iERR ion_read_string_as_chars(hREADER reader, char **out) {
     iRETURN;
 }
 
-void ion_test_print_bytes(BYTE *bytes, SIZE length) {
+void ion_test_print_bytes(BYTE *bytes, ION_SIZE length) {
     for(int i = 0; i < length; i++) {
         printf("\\x%02X", bytes[i]);
     }

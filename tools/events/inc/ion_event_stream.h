@@ -37,11 +37,11 @@ public:
     ION_TYPE ion_type;
     ION_SYMBOL *field_name;
     ION_SYMBOL *annotations;
-    SIZE num_annotations;
+    ION_SIZE num_annotations;
     int depth;
     void *value;
 
-    IonEvent(ION_EVENT_TYPE event_type, ION_TYPE ion_type, ION_SYMBOL *field_name, ION_SYMBOL *annotations, SIZE num_annotations, int depth);
+    IonEvent(ION_EVENT_TYPE event_type, ION_TYPE ion_type, ION_SYMBOL *field_name, ION_SYMBOL *annotations, ION_SIZE num_annotations, int depth);
     ~IonEvent();
 };
 
@@ -60,7 +60,7 @@ public:
      * It is up to the caller to set the returned IonEvent's value.
      */
     IonEvent *appendNew(ION_EVENT_TYPE event_type, ION_TYPE ion_type, ION_SYMBOL *field_name,
-                        ION_SYMBOL *annotations, SIZE num_annotations, int depth);
+                        ION_SYMBOL *annotations, ION_SIZE num_annotations, int depth);
 
     size_t size() {
         return event_stream->size();

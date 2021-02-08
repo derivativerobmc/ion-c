@@ -403,7 +403,7 @@ iERR symbol_table_fill( hREADER hreader )
     ION_TYPE   type;
     ION_STRING str;
     int        ii, count;
-    SID        sid;
+    ION_SID        sid;
     BOOL       has_annotations, is_null;
     int        next_counter = 0;  // just to track our progress, esp while debugging
     
@@ -451,8 +451,8 @@ iERR symbol_table_write( hWRITER hwriter )
     iENTER;
     ION_STRING  temp;
     ION_SYMBOL *sym;
-    SID         ii, sorted_count, sid, max_sid;
-    SID        *sidlist = NULL;
+    ION_SID         ii, sorted_count, sid, max_sid;
+    ION_SID        *sidlist = NULL;
 
 
     if (!g_hsymtab) {
@@ -517,8 +517,8 @@ iERR symbol_table_write( hWRITER hwriter )
 int compare_sids_by_count(const void *psid1, const void *psid2) 
 {
     iERR        err1, err2;
-    SID         sid1 = *(int *)psid1;
-    SID         sid2 = *(int *)psid2;
+    ION_SID         sid1 = *(int *)psid1;
+    ION_SID         sid2 = *(int *)psid2;
     int         len, ret = 0;
     ION_SYMBOL *sym1, *sym2;
 

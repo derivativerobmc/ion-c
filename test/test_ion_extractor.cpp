@@ -77,7 +77,7 @@
  */
 #define ION_EXTRACTOR_TEST_PATH_FROM_TEXT(text, assertion_func) \
     ION_EXTRACTOR_TEST_NEXT_CONTEXT(assertion_func); \
-    ION_ASSERT_OK(ion_extractor_path_create_from_ion(extractor, &testCallback, assertion_context, (BYTE *)text, (SIZE)strlen(text), &path)); \
+    ION_ASSERT_OK(ion_extractor_path_create_from_ion(extractor, &testCallback, assertion_context, (BYTE *)text, (ION_SIZE)strlen(text), &path)); \
     ION_EXTRACTOR_TEST_PATH_END;
 
 /**
@@ -849,7 +849,7 @@ TEST(IonExtractorFailsWhen, PathFromIonExceedsMaxLength) {
     options.max_num_paths = ION_EXTRACTOR_MAX_NUM_PATHS;
     const char *ion_text = "(foo bar)"; // Length: 2, max_length: 1.
     ION_ASSERT_OK(ion_extractor_open(&extractor, &options));
-    ION_ASSERT_FAIL(ion_extractor_path_create_from_ion(extractor, &testCallbackBasic, NULL, (BYTE *)ion_text, (SIZE)strlen(ion_text), &path));
+    ION_ASSERT_FAIL(ion_extractor_path_create_from_ion(extractor, &testCallbackBasic, NULL, (BYTE *)ion_text, (ION_SIZE)strlen(ion_text), &path));
     ION_ASSERT_OK(ion_extractor_close(extractor));
 }
 
@@ -1054,7 +1054,7 @@ TEST(IonExtractorFailsWhen, DataContainsUnexpectedEOF) {
     const char *path_text = "()";
     ION_ASSERT_OK(ion_extractor_open(&extractor, &options));
     ION_ASSERT_OK(ion_extractor_path_create_from_ion(extractor, &ion_extractor_eof_callback, NULL, (BYTE *)path_text,
-                                                     (SIZE)strlen(path_text), &path));
+                                                     (ION_SIZE)strlen(path_text), &path));
     ION_ASSERT_OK(ion_test_new_text_reader(ion_text, &reader));
     ION_ASSERT_FAIL(ion_extractor_match(extractor, reader));
     ION_ASSERT_OK(ion_extractor_close(extractor));

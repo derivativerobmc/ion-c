@@ -92,7 +92,7 @@ void test_ion_cli_compare(const char *input, ION_CLI_IO_TYPE input_type, ION_STR
 void test_ion_cli_read_stream_successfully(BYTE *data, size_t data_len, IonEventStream *stream) {
     hREADER reader;
     IonEventResult result;
-    ION_ASSERT_OK(ion_test_new_reader(data, (SIZE)data_len, &reader));
+    ION_ASSERT_OK(ion_test_new_reader(data, (ION_SIZE)data_len, &reader));
     ION_ASSERT_OK(ion_event_stream_read_all(reader, NULL, stream, &result));
     ION_ASSERT_OK(ion_reader_close(reader));
     ASSERT_FALSE(result.has_error_description);

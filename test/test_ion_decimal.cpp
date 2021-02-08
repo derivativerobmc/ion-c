@@ -50,7 +50,7 @@
     hWRITER writer = NULL; \
     ION_STREAM *ion_stream = NULL; \
     BYTE *result; \
-    SIZE result_len; \
+    ION_SIZE result_len; \
     ION_ASSERT_OK(ion_test_new_writer(&writer, &ion_stream, is_binary));
 
 #define ION_DECIMAL_READER_DECLARE \
@@ -154,7 +154,7 @@ TEST(IonBinaryDecimal, RoundtripPreservesFullFidelityDecNumber) {
 
     ION_DECIMAL_TEXT_TO_BINARY(53);
 
-    ION_ASSERT_OK(ion_test_new_reader(result, (SIZE)result_len, &reader));
+    ION_ASSERT_OK(ion_test_new_reader(result, (ION_SIZE)result_len, &reader));
     ION_DECIMAL_READER_NEXT;
     ION_ASSERT_OK(ion_reader_read_ion_decimal(reader, &ion_decimal_after));
     ION_ASSERT_OK(ion_reader_close(reader));

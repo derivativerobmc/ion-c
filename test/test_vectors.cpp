@@ -252,7 +252,7 @@ iERR read_value_stream(IonEventStream *stream, READER_INPUT_TYPE input_type, std
             rewind(fstream);                // Set position indicator to the beginning
             buffer = (char *)malloc(size);
             buffer_len = fread(buffer, 1, size, fstream);  // copy the file into the buffer:
-            IONCREAD(ion_reader_open_buffer(&reader, (BYTE *)buffer, (SIZE)buffer_len, &options));
+            IONCREAD(ion_reader_open_buffer(&reader, (BYTE *)buffer, (ION_SIZE)buffer_len, &options));
             break;
         default:
             IONFAILSTATE(IERR_INVALID_ARG, "Unknown READER_INPUT_TYPE.");
@@ -278,7 +278,7 @@ void write_ion_event_result(IonEventResult *result, ION_CATALOG *catalog, std::s
     IonEventWriterContext writer_context;
     std::string message;
     BYTE *out = NULL;
-    SIZE len;
+    ION_SIZE len;
     std::string location = test_name + " result";
     ASSERT_EQ(IERR_OK, ion_event_in_memory_writer_open(&writer_context, OUTPUT_TYPE_TEXT_PRETTY, NULL, NULL,
                                                        &location, NULL));
@@ -306,7 +306,7 @@ iERR ionTestRoundtrip(IonEventStream *initial_stream, IonEventStream **roundtrip
     iENTER;
     if (test_type > READ) {
         BYTE *written = NULL;
-        SIZE len;
+        ION_SIZE len;
         IONREPORT(ion_event_stream_write_all_to_bytes(initial_stream,
                                                       (test_type == ROUNDTRIP_BINARY ? OUTPUT_TYPE_BINARY
                                                                                      : OUTPUT_TYPE_TEXT_UGLY),

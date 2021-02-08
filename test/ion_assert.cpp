@@ -14,7 +14,7 @@
 
 #include "ion_assert.h"
 
-std::string _bytesToHexString(const BYTE *bytes, SIZE len) {
+std::string _bytesToHexString(const BYTE *bytes, ION_SIZE len) {
     std::stringstream ss;
     ss << std::hex;
     for (int i = 0; i < len; ++i) {
@@ -23,7 +23,7 @@ std::string _bytesToHexString(const BYTE *bytes, SIZE len) {
     return ss.str();
 }
 
-void assertBytesEqual(const char *expected, SIZE expected_len, const BYTE *actual, SIZE actual_len) {
+void assertBytesEqual(const char *expected, ION_SIZE expected_len, const BYTE *actual, ION_SIZE actual_len) {
     ASSERT_EQ(expected_len, actual_len);
     BOOL bytes_not_equal = memcmp((BYTE *)expected, actual, (size_t)actual_len);
     if (bytes_not_equal) {
@@ -32,7 +32,7 @@ void assertBytesEqual(const char *expected, SIZE expected_len, const BYTE *actua
     }
 }
 
-void assertStringsEqual(const char *expected, const char *actual, SIZE actual_len) {
+void assertStringsEqual(const char *expected, const char *actual, ION_SIZE actual_len) {
     BOOL strings_not_equal = strlen(expected) != actual_len || strncmp(expected, actual, (size_t)actual_len);
     if (strings_not_equal) {
         ASSERT_FALSE(strings_not_equal) << std::string(expected) << " vs. " << std::endl

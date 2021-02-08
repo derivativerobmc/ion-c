@@ -21,11 +21,11 @@
 /**
  * Tests that the given bytes are equal.
  */
-void assertBytesEqual(const char *expected, SIZE expected_len, const BYTE *actual, SIZE actual_len);
+void assertBytesEqual(const char *expected, ION_SIZE expected_len, const BYTE *actual, ION_SIZE actual_len);
 
 /**
  * Tests that the given strings are equal.
  */
-void assertStringsEqual(const char *expected, const char *actual, SIZE actual_len);
+void assertStringsEqual(const char *expected, const char *actual, ION_SIZE actual_len);
 
 #endif

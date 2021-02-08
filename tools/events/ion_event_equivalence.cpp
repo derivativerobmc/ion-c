@@ -481,7 +481,7 @@ BOOL ion_equals_symbol(ION_SYMBOL *expected, ION_SYMBOL *actual, std::string *fa
 }
 
 char *ion_compare_int_to_string(ION_INT *value) {
-    SIZE len, written;
+    ION_SIZE len, written;
     ion_int_char_length(value, &len);
     char *int_str = (char *)malloc(len * sizeof(char));
     ion_int_to_char(value, (BYTE *)int_str, len, &written);
@@ -538,7 +538,7 @@ BOOL _ion_equals_timestamp_common(ION_TIMESTAMP *expected, ION_TIMESTAMP *actual
     if (failure_message) {
         char expected_str[ION_MAX_TIMESTAMP_STRING];
         char actual_str[ION_MAX_TIMESTAMP_STRING];
-        SIZE expected_str_len, actual_str_len;
+        ION_SIZE expected_str_len, actual_str_len;
         ION_EXPECT_OK(ion_timestamp_to_string(expected, expected_str, ION_MAX_TIMESTAMP_STRING, &expected_str_len,
                                               &g_IonEventDecimalContext));
         ION_EXPECT_OK(ion_timestamp_to_string(actual, actual_str, ION_MAX_TIMESTAMP_STRING, &actual_str_len,

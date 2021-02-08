@@ -383,7 +383,7 @@ iERR ionizer_count_types(hREADER hreader, ION_TYPE value_type)
 {
     iENTER;
     BOOL has_annotations, is_null;
-    SIZE annotation_count;
+    ION_SIZE annotation_count;
     ION_STRING fieldname;
 
     ION_STRING_INIT(&fieldname);
@@ -581,7 +581,7 @@ iERR ionizer_load_symbol_table(void)
 {
     iENTER;
     ION_STRING temp;
-    SIZE       len;
+    ION_SIZE       len;
 
     if (!g_writer_options.pcatalog) {
         ionizer_print_help();
@@ -615,7 +615,7 @@ iERR ionizer_new_symbol_table_init(void)
     ION_SYMBOL_TABLE_TYPE type;
     ION_STRING  name;
     ION_SYMBOL *sym;
-    SID         sid, max_id, new_sid;
+    ION_SID         sid, max_id, new_sid;
 
     ION_STRING_INIT(&name);
 
@@ -664,7 +664,7 @@ iERR ionizer_new_symbol_table_fill( hREADER hreader )
     ION_TYPE   type;
     ION_STRING str;
     int        ii, count;
-    SID        sid;
+    ION_SID        sid;
     BOOL       has_annotations, is_null;
     
     ION_STRING_INIT(&str);
@@ -712,8 +712,8 @@ iERR ionizer_new_symbol_table_write( hWRITER hwriter )
     iENTER;
     ION_STRING  name, temp;
     ION_SYMBOL *sym;
-    SID         ii, sorted_count, sid, max_sid;
-    SID        *sidlist = NULL;
+    ION_SID         ii, sorted_count, sid, max_sid;
+    ION_SID        *sidlist = NULL;
     int         version, len;
 
     if (!g_hsymtab) {
@@ -791,8 +791,8 @@ iERR ionizer_new_symbol_table_write( hWRITER hwriter )
 int ionizer_compare_sids_by_count(const void *psid1, const void *psid2) 
 {
     iERR        err1, err2;
-    SID         sid1 = *(int *)psid1;
-    SID         sid2 = *(int *)psid2;
+    ION_SID         sid1 = *(int *)psid1;
+    ION_SID         sid2 = *(int *)psid2;
     int         len, ret = 0;
     ION_SYMBOL *sym1, *sym2;
 

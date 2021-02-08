@@ -45,7 +45,7 @@ TEST_P(TextAndBinary, SeekToTopLevelScalar) {
     ION_STRING abc_written, def_written, abc_read, def_read;
     int32_t int_written = 123, int_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION abc_value_position, def_value_position;
 
     ion_string_from_cstr("abc", &abc_written);
@@ -101,7 +101,7 @@ TEST_P(TextAndBinary, SeekToTopLevelAnnotatedScalar) {
     ION_STRING annotation_written, annotation_read_on_123, annotation_read_on_abc, annotation_read_on_def;
     int32_t int_written = 123, int_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION abc_value_position, def_value_position;
 
     ion_string_from_cstr("abc", &abc_written);
@@ -166,7 +166,7 @@ TEST_P(TextAndBinary, SeekToTopLevelContainer) {
     int32_t int_written = 123, int_read;
     double float_written = 0., float_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION first_struct_position, second_struct_position;
     BOOL is_in_struct;
 
@@ -234,7 +234,7 @@ TEST_P(TextAndBinary, SeekToTopLevelAnnotatedContainer) {
     int32_t int_written = 123, int_read;
     double float_written = 0., float_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION first_struct_position, second_struct_position;
     BOOL is_in_struct;
 
@@ -307,7 +307,7 @@ TEST_P(TextAndBinary, SeekAcrossSymbolTableBoundary) {
     ION_STRING abc_written, def_written, abc_read, def_read;
     int32_t int_written = 123, int_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION abc_value_position, def_value_position;
     ION_SYMBOL_TABLE *abc_table, *def_table, *abc_table_clone, *def_table_clone;
 
@@ -378,9 +378,9 @@ TEST_P(TextAndBinary, SeekWithLimitsUsingGetValueLength) {
     ION_STRING annotation_written, annotation_read_on_abc;
     int32_t int_written = 123, int_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION int_value_position, list_value_position, abc_value_position;
-    SIZE int_value_length, list_value_length, abc_value_length;
+    ION_SIZE int_value_length, list_value_length, abc_value_length;
 
     ion_string_from_cstr("abc", &abc_written);
     ion_string_from_cstr("str", &annotation_written);
@@ -452,9 +452,9 @@ TEST_P(TextAndBinary, SeekWithLimitsUsingLengthCalculatedFromPosition) {
     ION_STRING annotation_written, annotation_read_on_abc;
     int32_t int_written = 123, int_read;
     BYTE *data;
-    SIZE data_length;
+    ION_SIZE data_length;
     POSITION int_value_position, list_value_position, abc_value_position, end_position;
-    SIZE int_value_length, list_value_length, abc_value_length;
+    ION_SIZE int_value_length, list_value_length, abc_value_length;
 
     ion_string_from_cstr("abc", &abc_written);
     ion_string_from_cstr("str", &annotation_written);
