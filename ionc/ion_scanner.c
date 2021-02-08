@@ -2165,12 +2165,12 @@ iERR _ion_scanner_read_possible_number(ION_SCANNER *scanner, int c, int sign, IO
     // if we have an x we have a hexadecimal int
     if (c == 'x' || c == 'X') {
         PUSH_VALUE_BYTE(c);
-        IONCHECK(_ion_scanner_read_hex_int(scanner, &dst, &remaining));
+        IONCHECK(_ion_scanner_read_hex_int(scanner, &dst, &remaining, &c));
         t = (sign == -1) ? IST_INT_NEG_HEX : IST_INT_POS_HEX;
     }
     else if (c == 'b' || c == 'B') {
         PUSH_VALUE_BYTE(c);
-        IONCHECK(_ion_scanner_read_binary_int(scanner, &dst, &remaining));
+        IONCHECK(_ion_scanner_read_binary_int(scanner, &dst, &remaining, &c));
         t = (sign == -1) ? IST_INT_NEG_BINARY : IST_INT_POS_BINARY;
     }
     else {
@@ -2202,7 +2202,7 @@ iERR _ion_scanner_read_possible_number(ION_SCANNER *scanner, int c, int sign, IO
                 // no negative timestamps and a year is 4 digits long
                 FAILWITH(IERR_INVALID_TIMESTAMP);
             }
-            IONCHECK(_ion_scanner_read_timestamp(scanner, c, &dst, &remaining, &t));
+            IONCHECK(_ion_scanner_read_timestamp(scanner, c, &dst, &remaining, &c, &t));
             // note that read timestamp doesn't overread
         }
         else {
@@ -2251,6 +2251,9 @@ iERR _ion_scanner_read_possible_number(ION_SCANNER *scanner, int c, int sign, IO
         }
     }
 
+    if (c > 0 && strchr(NUMERIC_STOP_CHARACTERS, c) == NULL) {
+        FAILWITH(IERR_INVALID_SYNTAX);
+    }
     // we have a good_value, set up the value state to reflect this
     PUSH_VALUE_BYTE('\0');
     scanner->_value_location     = SVL_VALUE_IMAGE;
@@ -2298,20 +2301,22 @@ iERR _ion_scanner_read_radix_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p
     iRETURN;
 }
 
-iERR _ion_scanner_read_hex_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining)
+iERR _ion_scanner_read_hex_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_end_char)
 {
     iENTER;
     int c;
     IONCHECK(_ion_scanner_read_radix_int(scanner, p_dst, p_remaining, &c, ION_INT_HEX, FALSE));
+    *p_end_char = c;
     IONCHECK(_ion_scanner_unread_char(scanner, c));
     iRETURN;
 }
 
-iERR _ion_scanner_read_binary_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining)
+iERR _ion_scanner_read_binary_int(ION_SCANNER *scanner, BYTE **p_dst, ION_SIZE *p_remaining, int *p_end_char)
 {
     iENTER;
     int c;
     IONCHECK(_ion_scanner_read_radix_int(scanner, p_dst, p_remaining, &c, ION_INT_BINARY, FALSE));
+    *p_end_char = c;
     IONCHECK(_ion_scanner_unread_char(scanner, c));
     iRETURN;
 }
@@ -2375,7 +2380,7 @@ past_exponent:
     iRETURN;
 }
 
-iERR _ion_scanner_read_timestamp(ION_SCANNER *scanner, int c, BYTE **p_dst, ION_SIZE *p_remaining, ION_SUB_TYPE *p_ist )
+iERR _ion_scanner_read_timestamp(ION_SCANNER *scanner, int c, BYTE **p_dst, ION_SIZE *p_remaining, int *p_end_char, ION_SUB_TYPE *p_ist)
 {
     iENTER;
     ION_SUB_TYPE t                      = IST_TIMESTAMP_YEAR;
@@ -2511,6 +2516,7 @@ check_timestamp_terminator:
     *p_dst       = dst;
     *p_remaining = remaining;
     *p_ist       = t;
+    *p_end_char = c;
 
     iRETURN;
 }

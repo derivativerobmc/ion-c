@@ -99,6 +99,8 @@ BOOL ion_compare_scalars(ION_EVENT_EQUIVALENCE_PARAMS) {
  */
 BOOL ion_compare_struct_subset(ION_EVENT_EQUIVALENCE_PARAMS) {
     const int target_depth = ION_GET_EXPECTED->depth;
+    const int index_expected_container_start = ION_INDEX_ACTUAL_ARG;
+    const int index_actual_container_start = ION_INDEX_EXPECTED_ARG;
     ION_NEXT_INDICES; // Move past the CONTAINER_START events
     const size_t index_actual_start = ION_INDEX_ACTUAL_ARG;
     std::set<size_t> skips;
@@ -114,8 +116,9 @@ BOOL ion_compare_struct_subset(ION_EVENT_EQUIVALENCE_PARAMS) {
         while (ION_INDEX_ACTUAL_ARG < ION_STREAM_ACTUAL_ARG->size()) {
             if (skips.count(ION_INDEX_ACTUAL_ARG) == 0) {
                 ION_SET_ACTUAL;
-                ION_EXPECT_TRUE(!(ION_ACTUAL_ARG->event_type == CONTAINER_END && ION_ACTUAL_ARG->depth == target_depth),
-                                "Did not find matching field for " + ion_event_symbol_to_string(expected_field_name));
+                ION_EXPECT_TRUE_WITH_INDEX(!(ION_ACTUAL_ARG->event_type == CONTAINER_END && ION_ACTUAL_ARG->depth == target_depth),
+                                           "Did not find matching field for " + ion_event_symbol_to_string(expected_field_name),
+                                           index_expected_container_start, index_actual_container_start);
                 ION_ASSERT(IERR_OK == ion_symbol_is_equal(expected_field_name,
                                                           ION_ACTUAL_ARG->field_name, &field_names_equal),
                            "Failed to compare field names.");
@@ -157,6 +160,12 @@ BOOL ion_compare_sequences(ION_EVENT_EQUIVALENCE_PARAMS) {
                 ION_EXPECT_TRUE(FALSE, "Streams have different lengths");
             }
             // The streams are incomplete, but they are the same length and all their values are equivalent.
+            break;
+        }
+        if (ION_STREAM_ACTUAL_ARG->size() == ION_INDEX_ACTUAL_ARG) {
+            if (ION_STREAM_EXPECTED_ARG->size() != ION_INDEX_EXPECTED_ARG) {
+                ION_EXPECT_TRUE(FALSE, "Streams have different lengths");
+            }
             break;
         }
         ION_EXPECTED_ARG = ION_GET_EXPECTED;
@@ -264,7 +273,7 @@ BOOL ion_compare_sets_nonequivs(ION_EVENT_EQUIVALENCE_PARAMS) {
     // The corresponding indices are assumed to be equivalent.
     if (ION_INDEX_EXPECTED_ARG != ION_INDEX_ACTUAL_ARG) {
         ION_PREPARE_COMPARISON;
-        ION_EXPECT_FALSE(ion_compare_events(ION_EVENT_EQUIVALENCE_ARGS), "Equivalent values in a non-equivs set.");
+        ION_EXPECT_FALSE_FOR_NON_EQUIVS(ion_compare_events(ION_EVENT_EQUIVALENCE_ARGS), "Equivalent values in a non-equivs set.");
     }
     ION_PASS_ASSERTIONS;
 }
@@ -340,11 +349,12 @@ BOOL ion_compare_sets_embedded(ION_EVENT_EQUIVALENCE_PARAMS, size_t *expected_le
                     ION_ASSERT(ION_COMPARISON_TYPE_ARG == COMPARISON_TYPE_NONEQUIVS,
                                "Invalid embedded documents comparison type.");
                     if (step_expected == 1 && step_actual == 1) {
-                        ION_EXPECT_FALSE(step_expected == 1 && step_actual == 1,
-                                         "Both embedded streams are empty stream in a non-equivs set.")
+                        ION_EXPECT_FALSE_FOR_NON_EQUIVS(
+                                step_expected == 1 && step_actual == 1,
+                                "Both embedded streams are empty stream in a non-equivs set.")
                     }
                     else if (step_expected > 1 && step_actual > 1) {
-                        ION_EXPECT_FALSE(
+                        ION_EXPECT_FALSE_FOR_NON_EQUIVS(
                                 ion_compare_substreams(ION_STREAM_EXPECTED_ARG, ION_INDEX_EXPECTED_ARG,
                                                        ION_STREAM_ACTUAL_ARG, ION_INDEX_ACTUAL_ARG,
                                                        COMPARISON_TYPE_BASIC, /*result=*/NULL, // Result not needed.

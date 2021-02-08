@@ -84,7 +84,7 @@ static const char *const VERSION_GLOSSARY = "print the command's version number 
 //   - no errors
 //   - no input for multiple input options
 static const int ARG_MAX_ERRORS = 20;
-static const int MAX_NO_INPUTS = 24;
+static const int MAX_NO_INPUTS = 48;
 
 // Common args shared by subcommands
 static const char *const OUTPUT_SHORT_OPT = "o";
@@ -730,7 +730,9 @@ bool arg_tables_not_initalized() {
     return result;
 }
 
-int main(int argc, char **argv) {
+extern "C" int ion_c_cli_main(int argc, char **argv);
+
+int ion_c_cli_main(int argc, char **argv) {
     iENTER;
 
     IonEventReport report;
@@ -859,3 +861,14 @@ int main(int argc, char **argv) {
 
     iRETURN;
 }
+
+/**
+ * External programs may compile the CLI as a library and invoke
+ * ion_c_cli_main() themselves.
+ */ 
+#ifndef EXTERNAL_DRIVER
+int main(int argc, char **argv) {
+    return ion_c_cli_main(argc, argv);
+}
+#endif
+
